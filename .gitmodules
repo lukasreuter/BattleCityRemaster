@@ -1,0 +1,9 @@
+[submodule "magnum"]
+	path = magnum
+	url = https://github.com/mosra/magnum
+[submodule "corrade"]
+	path = corrade
+	url = https://github.com/mosra/corrade
+[submodule "src/entt"]
+	path = src/entt
+	url = https://github.com/skypjack/entt
