@@ -1,4 +1,7 @@
-find_package(Magnum REQUIRED GL Sdl2Application)
+find_package(Magnum REQUIRED
+    GL
+    Sdl2Application
+    SceneGraph)
 
 set_directory_properties(PROPERTIES CORRADE_USE_PEDANTIC_FLAGS ON)
 
@@ -18,4 +21,5 @@ target_include_directories(BattleCity2018 PRIVATE ${ENTT})
 target_link_libraries(BattleCity2018 PRIVATE
     Magnum::Application
     Magnum::GL
-    Magnum::Magnum)
+    Magnum::Magnum
+    Magnum::SceneGraph)
