@@ -1,73 +1,87 @@
 #include "HealthManager.h"
 #include "Components.h"
 #include "MessageManager.h"
+#include "Messages.h"
 #include "ScreenManager.h"
 #include "MapManager.h"
+#include "EntityManager.h"
+#include "Logger.h"
 #include <iostream>
 #include <string>
 
 
-void HealthManager::init()
+HealthManager::HealthManager() noexcept
 {
-    /* TODO:
-    EventConnection = MessageManager::GetRef().on<HitEvent>([](const HitEvent& event, MessageManager& emitter) {
-        
-    });
-    MessageManager::GetRef().subscribe<HitEvent>(*this);
-    */
+    MessageManager::GetRef().subscribe<HitEvent>(this);
+
+    LOGD(GREENBOLD << "HealthManager" << RESET << "configured")
+}
+
+HealthManager::~HealthManager()
+{
+    MessageManager::GetRef().unsubscribe<HitEvent>(this);
+
+    LOGD(GREENBOLD << "HealthManager" << RESET << "shutdown")
 }
 
 void HealthManager::receive(const HitEvent& event)
 {
-    /* TODO:
-    std::cout<<"ricevuto"<<std::endl;
-    entityx::ptr<entityx::EntityManager> entities = ScreenManager::GetRef().getCurrentEntities();
+    LOGD("ricevuto");
+    auto& registry = EntityManager::Registry();
     
-    for(auto entity : entities->entities_with_components<Destroyable, Renderable>())
+    //!@todo: replace the lambda with a loop or else the early return dont work as expected
+    auto view = registry.view<Destroyable, Renderable, Name>();
+    //.each([&registry, &event] (auto entity, auto& destroyable, auto& renderable, auto& entName)
+    for (auto entity : view)
     {
-        ptr<Destroyable> points = entity.component<Destroyable>();
-        std::string entName = entity.component<Name>()->name;
-        std::tring name;
+        auto& destroyable = registry.get<Destroyable>(entity);
+        auto& renderable = registry.get<Renderable>(entity);
+        auto& entName = registry.get<Name>(entity);
+        
+        std::string name;
 
-        if(entName != "Block"){
-            ptr<Children> child = entity.component<Children>();
-            name = child->children["body"].component<Renderable>()->sceneNode->getName();
-        }else{
-            ptr<Renderable> rend = entity.component<Renderable>();
-            name = rend->sceneNode->getName();
+        if (entName.name != "Block")
+        {
+            auto& child = registry.get<Children>(entity);
+            //! @todo
+//            name = child.children["body"].component<Renderable>()->sceneNode->getName();
+        } else {
+//            ptr<Renderable> rend = entity.component<Renderable>();
+            //! @todo
+//            name = renderable.sceneNode->getName();
         }
 
-        std::cout<<"name: "<<name<<std::endl;
+        LOGD("name: " << name);
 
+        int max = destroyable.maxHealth;
 
-        int max = points->maxHealth;
-
-        if(name.compare(event.targetName)==0)
+        if (name == event.targetName)
         {
-            points->health-=event.points;
-            if(points->health<=0)
+            destroyable.health -= event.points;
+            if (destroyable.health <= 0)
             {
-                MessageManager::getPtr()->emit<ObjectDestroyed>(entity);
-                if(entity.valid()){
-                    if(entity.component<Name>()->name == "Block")
+                MessageManager::GetRef().emit<ObjectDestroyed>(entity);
+                
+//                if (entity.valid()) redundant as the entity is always valid when using a view
+                {
+                    auto& pos = registry.get<Position>(entity);
+                    if (entName.name == "Block")
                     {
-                        MapManager::getPtr()->deletePosition(entity.component<Position>()->position);
-                        RenderManager::getPtr()->getSceneManager()->destroySceneNode(entity.component<Renderable>()->sceneNode);
-                        entity.destroy();
-                    }else{
-                        entity.assign<Position>(MapManager::getPtr()->getFreePos());
-                        entity.assign<Destroyable>(max,max);
+                        MapManager::GetRef().DeletePosition(pos.position);
+//!@todo fix this                        RenderManager::GetRef().getSceneManager().destroySceneNode(renderable.sceneNode);
+                        //!                        entity.destroy(); @todo: defer this to ouside the loop
+                    } else {
+                        pos.position = MapManager::GetRef().FindFreePos();
+                        destroyable.health = max;
+                        destroyable.maxHealth = max;
                     }
                 }
                 return;
-            }else{
-                std::cout<<"punti"<<points->health<<std::endl;
-                entity.assign<Destroyable>(points->health,max);
+            } else {
+                LOGD("punti" << destroyable.health)
+//                entity.assign<Destroyable>(points->health, max);
             }
             return;
         }
-
     }
-    return;
-    */
 }

@@ -2,30 +2,21 @@
 
 #include "Singleton.h"
 #include "RenderManager.h"
+#include <Magnum/Platform/Sdl2Application.h>
+
+typedef Magnum::Platform::Sdl2Application::KeyEvent KeyEvent;
+typedef Magnum::Platform::Sdl2Application::MouseEvent MouseEvent;
+typedef Magnum::Platform::Sdl2Application::MouseMoveEvent MouseMoveEvent;
 
 
 class InputManager : public Singleton<InputManager>
 {
 public:
     InputManager();
-    ~InputManager();
-    void init();
-    
-    void setWindowExtents(int width, int height);
-    
-    inline bool keyPressed(const struct KeyPressedEvent& arg);
-    inline bool keyReleased(const struct KeyReleasedEvent& arg);
-//    inline bool mouseMoved(const OIS::MouseEvent &arg);
-//    inline bool mousePressed(const OIS::MouseEvent &arg, OIS::MouseButtonID id);
-//    inline bool mouseReleased(const OIS::MouseEvent &arg, OIS::MouseButtonID id);
-    
-//    OIS::Mouse* getMouse();
-//    OIS::Keyboard* getKeyboard();
-/*
-private:
-    void capture();
-    OIS::InputManager* mInputMgr;
-    OIS::Mouse* mMouse;
-    OIS::Keyboard* mKeyboard;
-     */
+
+    void keyPressed(const KeyEvent& arg);
+    void keyReleased(const KeyEvent& arg);
+    void mouseMoved(MouseMoveEvent& arg);
+    void mousePressed(MouseEvent& arg);
+    void mouseReleased(MouseEvent& arg);
 };

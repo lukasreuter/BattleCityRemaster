@@ -81,8 +81,8 @@
  #ifndef __SOUNDMANAGER_H__
  #define __SOUNDMANAGER_H__
 
- #include <stdio.h>
- #include <string>
+ #include <cstdio>
+#include <string>
 
  // Comment this line if you don't have the EAX 2.0 SDK installed
  //#define _USEEAX

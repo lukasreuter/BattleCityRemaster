@@ -76,7 +76,6 @@ Entity Factory::createTank(entt::DefaultRegistry& entityMgr, std::string prefix,
     return entityMgr.create();
 }
 
-
 Entity Factory::createBlock(entt::DefaultRegistry& entityMgr, int x, int y, int z, std::string material)
 {/*
     Entity block = entityMgr->create();

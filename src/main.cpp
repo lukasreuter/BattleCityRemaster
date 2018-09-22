@@ -10,13 +10,11 @@
 #include <entt.hpp>
 
 //#include "Battlecity.h"
-#include "DotSceneLoader.h"
 #include "Factory.h"
 #include "MovementManager.h"
 #include "PlayerManager.h"
 #include "MapManager.h"
 #include "AIManager.h"
-#include "CollisionManager.h"
 #include "MessageManager.h"
 #include "HeatingManager.h"
 #include "HealthManager.h"
@@ -25,6 +23,8 @@
 #include "ParticleManager.h"
 #include "SoundManager.h"
 #include "InputManager.h"
+#include "EntityManager.h"
+#include "DebugManager.h"
 
 #include "Logger.h"
 
@@ -39,41 +39,57 @@ public:
 private:
 	void drawEvent() override;
 	void tickEvent() override;
-	
+
+	void viewportEvent(Sdl2Application::ViewportEvent &event) override;
+
+	void keyPressEvent(KeyEvent &event) override;
+
+	void keyReleaseEvent(KeyEvent &event) override;
+
 	bool _quitGame = false;
 	Timeline _timeline;
-    entt::DefaultRegistry registry;
 };
 
-BattleCityApp::BattleCityApp(const Arguments& arguments): Platform::Application{arguments, NoCreate}
+BattleCityApp::BattleCityApp(const Arguments& arguments): Platform::Application{arguments,
+    Configuration{}.setTitle("BattleCity 2018").setWindowFlags(Configuration::WindowFlag::Resizable)}
 {
-	{
-        /// create the actual window config. we can set the window title that way
-		const Vector2 dpiScaling = this->dpiScaling({});
-		Configuration conf;
-		conf.setTitle("BattleCity 2018")
-			.setSize(conf.size(), dpiScaling);
-		GLConfiguration glConf;
-
-		if (!tryCreate(conf, glConf))
-			create(conf, glConf);
-	}
+//    {
+//        /// create the actual window config. we can set the window title that way
+//        const Vector2 dpiScaling = this->dpiScaling({});
+//        Configuration conf;
+//        conf.setTitle("BattleCity 2018")
+//            .setSize(conf.size(), dpiScaling);
+//        GLConfiguration glConf;
+//
+//        if (!tryCreate(conf, glConf))
+//            create(conf, glConf);
+//    }
 
 	GL::Renderer::setClearColor(0xa5c9ea_rgbf);
+    setSwapInterval(1);
+    setMinimalLoopPeriod(16);
 	
 	LOGD("Hello! BattleCity2018 is running on"
 		<< GL::Context::current().version() << "using"
 		<< GL::Context::current().rendererString())
 	
-	_quitGame = false;
+//    _quitGame = false;
+    
+    /// MessageManager need to be the first component to init, everyone else depends on it
+    auto& m = MessageManager::GetRef();
+    /// not init the entity manager, other need it for preparing their components
+    auto& e = EntityManager::GetRef();
+    auto& registry = e.GetRegistry();
+    
+    auto& d = DebugManager::GetRef();
+    
 	RenderManager::GetRef().init("Battlecity");
 	LOGD("RENDER configured")
 	auto & SoundManager = SoundManager::GetRef();
 	//SoundManager.init();
 	//SoundManager.loadFiles();
 	//LOGD("Sound configured")
-	InputManager::GetRef().init();
-	LOGD("INPUT configured")
+	auto& InputManager = InputManager::GetRef();
 	//ScreenManager::GetRef().init(MenuScreen::GetRef());
 	LOGD("SCREEN configured")
 	
@@ -81,13 +97,13 @@ BattleCityApp::BattleCityApp(const Arguments& arguments): Platform::Application{
 	//LOGD("FRAME LISTENER attached")
 	PlayerManager::GetRef().init();
 	LOGD("PLAYER configured")
-	MapManager::GetRef().init();
+	MapManager::GetRef().Init();
 	LOGD("MAP configured")
-	MovementManager::GetRef().init();
+	MovementManager::GetRef().Init(registry);
 	LOGD("MOVEMENT configured")
-	AIManager::GetRef().init();
+	AIManager::GetRef().Init(registry);
 	LOGD("AI configured")
-	HealthManager::GetRef().init();
+	auto& h = HealthManager::GetRef();
 	LOGD("HEALTH configured")
 	ShootManager::GetRef().init();
 	LOGD("SHOOT configured")
@@ -102,10 +118,12 @@ BattleCityApp::BattleCityApp(const Arguments& arguments): Platform::Application{
 	_timeline.start();
 }
 
-void BattleCityApp::drawEvent() {
+void BattleCityApp::drawEvent()
+{
+    /// this is the render update, will only be called when the draw has been requested by dirtying the state with redraw()
+    
 	GL::defaultFramebuffer.clear(GL::FramebufferClear::Color);
 
-	/* TODO: Add your drawing code here */
 	
 	/// get the delta time elapsed since the last frame
 	auto dt = _timeline.previousFrameDuration();
@@ -114,30 +132,58 @@ void BattleCityApp::drawEvent() {
 	  //  return false;
 	
 	/// after all systems have been updated, actually draw to the screen
-	//RenderManager::getPtr()->update(dt);
-	//return !quitGame;
+//    RenderManager::GetRef()->update(dt);
 
+    /// swap front with the back buffer
 	swapBuffers();
+    /// advance the frame and time counter
 	_timeline.nextFrame();
+    // temp
+    redraw();
 }
 
 void BattleCityApp::tickEvent()
 {
+    /// this is the place where the simulation is run
+    bool dirtyRender = false;
+    
     auto dt = _timeline.previousFrameDuration();
     
-	//InputManager::GetRef().update();
+    auto& registry = EntityManager::GetRef().GetRegistry();
 	
 	//ScreenManager::getPtr()->update(dt);
 	
-	//AIManager::getPtr()->update(dt);
+    AIManager::GetRef().Update(dt, registry);
 	
     HeatingManager::GetRef().Update(dt, registry);
 	
-	//MovementManager::getPtr()->update(dt);
+	MovementManager::GetRef().Update(dt, registry);
 	
 	//ParticleManager::getPtr()->update(dt);
 	
 	//RenderManager::getPtr()->update(dt);
+    
+    dirtyRender |= true;
+    if (dirtyRender) {
+//        redraw();
+    }
+}
+
+void BattleCityApp::viewportEvent(Platform::Sdl2Application::ViewportEvent &event)
+{
+
+}
+
+void BattleCityApp::keyPressEvent(KeyEvent& event)
+{
+	InputManager::GetRef().keyPressed(event);
+    event.setAccepted();
+}
+
+void BattleCityApp::keyReleaseEvent(KeyEvent& event)
+{
+	InputManager::GetRef().keyReleased(event);
+    event.setAccepted();
 }
 
 MAGNUM_APPLICATION_MAIN(BattleCityApp)

@@ -2,7 +2,6 @@
 
 #include "MessageManager.h"
 #include "Singleton.h"
-#include <entt.hpp>
 
 
 class ScoreManager : public Singleton<ScoreManager>
@@ -13,6 +12,7 @@ public:
     
     void Init() {};
     void receive(const ObjectDestroyed& event);
+
     inline int GetScore() const { return score; };
     inline void ResetScore() { score = 0; };
     

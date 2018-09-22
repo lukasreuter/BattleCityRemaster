@@ -5,228 +5,212 @@
 #include "PlayerManager.h"
 #include "RenderManager.h"
 #include "Logger.h"
-#include <stdlib.h>
-#include <time.h>
+#include <cstdlib>
+#include <ctime>
 #include <iostream>
 
-
-//using namespace entityx;
-using namespace std;
 
 MapManager::MapManager()
 {
     //mRaySceneQuery = RenderManager::getPtr()->getSceneManager()->createRayQuery(Ogre::Ray());
 }
 
-void MapManager::init()
+void MapManager::Init()
 {
     //void receive(const KeyPressedEvent &event);
     //events->subscribe<KeyReleasedEvent>(*this);
 
 
-    vector<vector<bool>> maze;
-    //init_maze(maze);
+    std::vector<std::vector<bool>> maze;
     srand(time(0));
-    int toAdd=rand()%2+8;
-    for(int i=0;i<62;i+=toAdd){
-        for(int j=0;j<62;j+=toAdd)
-            maze_generator(maze,7,i,j);
-         toAdd=rand()%2+8;
+    int toAdd = rand() % 2 + 8;
+    for (auto i = 0; i < 62; i += toAdd)
+    {
+        for (auto j = 0; j < 62; j += toAdd)
+        {
+            MazeGenerator(maze, 7, i, j);
+        }
+        toAdd = rand() % 2 + 8;
     }
-   //print_maze();
-   /* init_maze(maze);
-    maze_generator(indeks, maze, backtrack_x, backtrack_y, 0, 0, 10, 0);
-    print_maze(maze,3,20);
-    init_maze(maze);
-    maze_generator(indeks, maze, backtrack_x, backtrack_y, 0, 0, 10, 0);
-    print_maze(maze,4,40);
-    init_maze(maze);
-    maze_generator(indeks, maze, backtrack_x, backtrack_y, 0, 0, 10, 0);
-    print_maze(maze,3,-40);*/
-
-
 }
 
-void MapManager::init_maze(int maze[MAX][MAX]){
-    for(int a = 0; a < MAX; a++)
+void MapManager::InitMaze(int maze[MAX][MAX])
+{
+    for (auto a = 0; a < MAX; ++a)
+    {
+        for (auto b = 0; b < MAX; ++b)
         {
-            for(int b = 0; b < MAX; b++)
+            maze[a][b] = (a % 2 == PATH || b % 2 == PATH)
+                ? WALL
+                : PATH;
+        }
+    }
+}
+
+void MapManager::MazeGenerator(std::vector<std::vector<bool>> maze, int size, int shiftx, int shiftz)
+{
+    using namespace std;
+    
+    const int maze_size_x = size;
+    const int maze_size_y = size;
+    list<pair<int, int>> drillers;
+
+    maze.resize(maze_size_y);
+    for (auto y = 0; y < maze_size_y; ++y)
+    {
+         maze[y].resize(maze_size_x);
+    }
+
+    for (auto x = 0; x < maze_size_x; ++x)
+    {
+        for (auto y = 0; y < maze_size_y; ++y)
+        {
+            maze[y][x] = false;
+        }
+    }
+
+    drillers.emplace_back(maze_size_x / 2, maze_size_y / 2);
+    while (!drillers.empty())
+    {
+        list<pair<int, int>>::iterator m, _m;
+        m = drillers.begin();
+        _m = drillers.end();
+        while (m != _m)
+        {
+            bool remove_driller = false;
+            switch(rand() % 4)
             {
-                if(a % 2 == 0 || b % 2 == 0)
-                    maze[a][b] = 1;
-                else
-                    maze[a][b] = PATH;
+                case 0:
+                    (*m).second -= 2;
+                    if ((*m).second < 0 || maze[(*m).second][(*m).first])
+                    {
+                        remove_driller = true;
+                        break;
+                    }
+                    maze[(*m).second + 1][(*m).first] = true;
+                    break;
+                case 1:
+                    (*m).second += 2;
+                    if ((*m).second >= maze_size_y || maze[(*m).second][(*m).first])
+                    {
+                        remove_driller = true;
+                        break;
+                    }
+                    maze[(*m).second - 1][(*m).first] = true;
+                    break;
+                case 2:
+                    (*m).first -= 2;
+                    if ((*m).first < 0 || maze[(*m).second][(*m).first])
+                    {
+                        remove_driller = true;
+                        break;
+                    }
+                    maze[(*m).second][(*m).first + 1] = true;
+                    break;
+                case 3:
+                    (*m).first += 2;
+                    if ((*m).first >= maze_size_x || maze[(*m).second][(*m).first])
+                    {
+                        remove_driller = true;
+                        break;
+                    }
+                    maze[(*m).second][(*m).first - 1] = true;
+                    break;
+            }
+            if (remove_driller)
+                m = drillers.erase(m);
+            else
+            {
+                drillers.emplace_back((*m).first, (*m).second);
+                // uncomment the line below to make the maze easier
+                // if (rand() % 2)
+                drillers.emplace_back((*m).first, (*m).second);
+
+                maze[(*m).second][(*m).first] = true;
+                ++m;
             }
         }
-}
-
-void MapManager::maze_generator(vector < vector < bool > > maze,int size,int shiftx,int shiftz){
-
-
-     const int maze_size_x=size;
-     const int maze_size_y=size;
-     list < pair < int, int> > drillers;
-
-     maze.resize(maze_size_y);
-    for (auto y = 0; y < maze_size_y; ++y)
-         maze[y].resize(maze_size_x);
-
-     for (size_t x=0;x<maze_size_x;x++)
-             for (size_t y=0;y<maze_size_y;y++)
-                     maze[y][x]=false;
-
-     drillers.push_back(make_pair(maze_size_x/2,maze_size_y/2));
-     while(drillers.size()>0)
-     {
-             list < pair < int, int> >::iterator m,_m,temp;
-             m=drillers.begin();
-             _m=drillers.end();
-             while (m!=_m)
-             {
-                     bool remove_driller=false;
-                     switch(rand()%4)
-                     {
-                     case 0:
-                             (*m).second-=2;
-                             if ((*m).second<0 || maze[(*m).second][(*m).first])
-                             {
-                                     remove_driller=true;
-                                     break;
-                             }
-                             maze[(*m).second+1][(*m).first]=true;
-                             break;
-                     case 1:
-                             (*m).second+=2;
-                             if ((*m).second>=maze_size_y || maze[(*m).second][(*m).first])
-                             {
-                                     remove_driller=true;
-                                     break;
-                             }
-                             maze[(*m).second-1][(*m).first]=true;
-                             break;
-                     case 2:
-                             (*m).first-=2;
-                             if ((*m).first<0 || maze[(*m).second][(*m).first])
-                             {
-                                     remove_driller=true;
-                                     break;
-                             }
-                             maze[(*m).second][(*m).first+1]=true;
-                             break;
-                     case 3:
-                             (*m).first+=2;
-                             if ((*m).first>=maze_size_x || maze[(*m).second][(*m).first])
-                             {
-                                     remove_driller=true;
-                                     break;
-                             }
-                             maze[(*m).second][(*m).first-1]=true;
-                             break;
-                     }
-                     if (remove_driller)
-                             m = drillers.erase(m);
-                     else
-                     {
-                             drillers.push_back(make_pair((*m).first,(*m).second));
-                             // uncomment the line below to make the maze easier
-                             // if (rand()%2)
-                             drillers.push_back(make_pair((*m).first,(*m).second));
-
-                             maze[(*m).second][(*m).first]=true;
-                             ++m;
-                     }
-             }
-     }
-     for (int y=0;y<maze_size_y;y++)
-                for (int x=0;x<maze_size_x;x++)
-                {
-                        if (maze[y][x]==true){
-                            //Factory::getPtr()->createBlock((x+shiftx-(125/4))*4, 0, (-125/4+y+shiftz)*4, "Wall");
-                            finalMaze[y+shiftz][x+shiftx]=1;
-                           // std::cout<<(x+shiftx-(125/4))*4<<" "<<(-125/4+y+shiftz)*4<<std::endl;
-                        }
-
-
-
-
-                }
-}
-
-int MapManager::is_closed(int maze[MAX][MAX], int x, int y)
-{
-    if (maze[x - 1][y] == WALL
-        && maze[x][y - 1] == WALL
-        && maze[x][y + 1] == WALL
-        && maze[x + 1][y] == WALL)
-    {
-       return 1;
     }
-
-    return 0;
+    
+    for (auto y = 0; y < maze_size_y; ++y)
+    {
+        for (auto x = 0; x < maze_size_x; ++x)
+        {
+            if (maze[y][x])
+            {
+                //Factory::GetRef().createBlock((x+shiftx-(125/4))*4, 0, (-125/4+y+shiftz)*4, "Wall");
+                _finalMaze[y + shiftz][x + shiftx] = WALL;
+                // std::cout<<(x+shiftx-(125/4))*4<<" "<<(-125/4+y+shiftz)*4<<std::endl;
+            }
+        }
+    }
 }
 
-void MapManager::print_maze(entt::DefaultRegistry& entities)
+int MapManager::IsClosed(int maze[MAX][MAX], int x, int y)
 {
-    int div=8;
-    int _shiftx=0;
-    int _shifty=0;
-    int pMetalTreshold = 15; // soglia scelta metallo invece di mattoni
+    return (maze[x - 1][y] == WALL
+            && maze[x][y - 1] == WALL
+            && maze[x][y + 1] == WALL
+            && maze[x + 1][y] == WALL)
+        ? WALL
+        : PATH;
+}
+
+void MapManager::PrintMaze(entt::DefaultRegistry& registry)
+{
+    constexpr int pMetalTreshold = 15; // soglia scelta metallo invece di mattoni
     int p = 0;
     std::string material;
-  for(int i=0;i<62;i++){
-      finalMaze[0][i]=1;
-      finalMaze[61][i]=1;
-      finalMaze[i][0]=1;
-      finalMaze[i][61]=1;
-  }
-  finalMaze[0][0]=2;
-  for(int i=0;i<MAX;i++){
-      for(int j=0;j<MAX;j++){
-          if(finalMaze[i][j]==1){
-              p = rand()%100;
-              if (i == 0 || i == MAX -1 || j == 0 || j == MAX -1 || p < pMetalTreshold)
-                  material = "Metal";
-              else
-                  material = "Wall";
-
-              Factory::createBlock(entities, (j - 125 / 4) * 4, 0, (i - 125 / 4) * 4, material);
-
-              //std::cout<<finalMaze[i][j]<<std::endl;
-          }
-      }
-  }
-
-}
-
-
-
-int MapManager::Collide(Position pos, Magnum::Vector3 delta, Orientation ori)
-{/*
-    delta *= 4;
-  //  int newx=x+delta.x;
-  //  int newz=y+delta.z;
-    Position newPos = pos.position + delta - ori.orientation.zAxis();
-   // std::cout<<newx<<" "<<newz<<" "<<(newx+125)/4<<" "<<(newz+125)/4<<std::endl;
-    if((newPos.position.x() + 125) / 4 < 0 || (newPos.position.x() + 125) / 4 > MAX)
-        return 0;
-    if((newPos.position.z() + 125) / 4 < 0 || (newPos.position.z() + 125) / 4 > MAX)
-        return 0;
-    if(finalMaze[int((newPos.position.z+125)/4)][int(newPos.position.x+125)/4]==1)
-        return 1;
-    newPos = pos.position+delta-2*ori.orientation.xAxis();
-    if(finalMaze[int((newPos.position.z+125)/4)][int(newPos.position.x+125)/4]==1)
-        return 1;
-    newPos = pos.position+delta+2*ori.orientation.xAxis();
-    if(finalMaze[int((newPos.position.z+125)/4)][int(newPos.position.x+125)/4]==1)
-        return 1;
-
-
-    return 0;
-  */
     
-    return 0;
+    for (int i = 0; i < 62; ++i)
+    {
+        _finalMaze[0][i] = WALL;
+        _finalMaze[61][i] = WALL;
+        _finalMaze[i][0] = WALL;
+        _finalMaze[i][61] = WALL;
+    }
+    
+    _finalMaze[0][0] = 2;
+    for (int i = 0; i < MAX; ++i)
+    {
+        for (int j = 0; j < MAX; ++j)
+        {
+            if (_finalMaze[i][j] == WALL)
+            {
+                p = rand() % 100;
+                material = (i == 0 || i == MAX - 1 || j == 0 || j == MAX - 1 || p < pMetalTreshold)
+                    ? "Metal"
+                    : "Wall";
+
+                Factory::createBlock(registry, (j - 125 / 4) * 4, 0, (i - 125 / 4) * 4, material);
+          }
+        }
+    }
 }
 
+int MapManager::Collide(Position pos, Magnum::Vector3 delta, Orientation ori) const
+{
+    using namespace Magnum;
+    
+    delta *= 4;
+    Vector3 newPos = pos.position + delta - Vector3::zAxis(ori.orientation.axis().z());
+    
+    if ((newPos.x() + 125) / 4 < 0 || (newPos.x() + 125) / 4 > MAX)
+        return PATH;
+    if ((newPos.z() + 125) / 4 < 0 || (newPos.z() + 125) / 4 > MAX)
+        return PATH;
+    if (_finalMaze[int((newPos.z() + 125) / 4)][int(newPos.x() + 125) / 4] == WALL)
+        return WALL;
+    
+    newPos = pos.position + delta - 2 * Vector3::xAxis(ori.orientation.axis().x());
+    if (_finalMaze[int((newPos.z() + 125) / 4)][int(newPos.x() + 125) / 4] == WALL)
+        return WALL;
+    newPos = pos.position + delta + 2 * Vector3::xAxis(ori.orientation.axis().x());
+    if (_finalMaze[int((newPos.z() + 125) / 4)][int(newPos.x() + 125) / 4] == WALL)
+        return WALL;
+
+    return PATH;
+}
 
 /*bool MapManager::fireCollision(entityx::ptr<Position> start, entityx::ptr<Orientation> direction, Ogre::String name){
   /*  Ogre::Ray ray(start->position,-direction->orientation.zAxis());
@@ -252,24 +236,24 @@ int MapManager::Collide(Position pos, Magnum::Vector3 delta, Orientation ori)
 }
 */
 
-bool MapManager::isFree(Magnum::Vector3 pos)
+bool MapManager::IsFree(Magnum::Vector3 pos)
 {
-    return finalMaze[int((pos.z() + 125) / 4)][int(pos.x() + 125) / 4] != WALL;
+    return _finalMaze[int((pos.z() + 125) / 4)][int(pos.x() + 125) / 4] != WALL;
 }
 
-void MapManager::deletePosition(Magnum::Vector3 pos)
+void MapManager::DeletePosition(Magnum::Vector3 pos)
 {
-    finalMaze[int((pos.z() + 125) / 4)][int(pos.x() + 125) / 4] = 0;
+    _finalMaze[int((pos.z() + 125) / 4)][int(pos.x() + 125) / 4] = PATH;
 }
 
-Magnum::Vector3 MapManager::getFreePos()
+Magnum::Vector3 MapManager::FindFreePos()
 {
     int x,z;
     do {
         x = (rand() % 220) - 110;
         z = (rand() % 220) - 110;
         LOGD(x << "-" << z);
-    } while (!isFree(Magnum::Vector3(x,0,z)));
+    } while (!IsFree(Magnum::Vector3(x, 0, z)));
 
-    return Magnum::Vector3(x,1,z);
+    return Magnum::Vector3(x, 1, z);
 }

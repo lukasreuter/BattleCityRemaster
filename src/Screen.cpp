@@ -9,34 +9,25 @@
 #include "ScreenManager.h"
 #include "Components.h"
 #include "ScoreManager.h"
+#include "Logger.h"
 #include <iostream>
 
-//using namespace OgreBites;
-//using namespace entityx;
 /****** SCREEN BASE CLASS ******/
-/*
-void Screen::mouseMoved(const OIS::MouseEvent &evt)
+void Screen::mouseMoved(const MouseMovedEvent& evt)
 {
-    if(mTrayMgr)
-        mTrayMgr->injectMouseMove(evt);
 }
 
-void Screen::mousePressed(const OIS::MouseEvent &evt, OIS::MouseButtonID id)
+void Screen::mousePressed(const MousePressedEvent& evt)
 {
-    if(mTrayMgr)
-        mTrayMgr->injectMouseDown(evt, id);
 }
 
-void Screen::mouseReleased(const OIS::MouseEvent &evt, OIS::MouseButtonID id)
+void Screen::mouseReleased(const MouseReleasedEvent& evt)
 {
-    if(mTrayMgr){
-        mTrayMgr->injectMouseUp(evt, id);
-    }
-}*/
+}
 
 
 /****** MENU SCREEN******/
-void MenuScreen::enter()
+void MenuScreen::Enter()
 {/*
     mTrayMgr = new SdkTrayManager("MenuTray",RenderManager::getPtr()->getRenderWindow(),
                                   InputManager::getPtr()->getMouse(), this);
@@ -54,17 +45,17 @@ void MenuScreen::enter()
   */
 }
 
-void MenuScreen::pause()
+void MenuScreen::Pause()
 {
     //mTrayMgr->hideAll();
 }
 
-void MenuScreen::resume()
+void MenuScreen::Resume()
 {
     //mTrayMgr->showAll();
 }
 
-void MenuScreen::leave()
+void MenuScreen::Leave()
 {/*
     mTrayMgr->destroyAllWidgets();
     delete mTrayMgr;
@@ -86,7 +77,7 @@ void MenuScreen::buttonHit(Button *button)
 
 }*/
 
-void MenuScreen::update(double dt)
+void MenuScreen::Update(float dt)
 {
   //  if(change)
     //    ScreenManager::getPtr()->changeScreen(PlayScreen::getPtr());
@@ -97,21 +88,18 @@ void MenuScreen::yesNoDialogClosed(const Ogre::DisplayString &question, bool yes
     //if( question == "Do you want to quit?" && yesHit)
       //  MessageManager::getPtr()->emit<ShutDownEvent>();
 }*/
-/*
-void MenuScreen::keyPressed(const OIS::KeyEvent &evt)
-{
 
+void MenuScreen::keyPressed(const KeyPressedEvent& evt)
+{
 }
 
-void MenuScreen::keyReleased(const OIS::KeyEvent &evt)
+void MenuScreen::keyReleased(const KeyReleasedEvent& evt)
 {
-
 }
-*/
 
 
 /****** PlayScreen ******/
-void PlayScreen::enter()
+void PlayScreen::Enter()
 {/*
     mEntities = entityx::EntityManager::make(MessageManager::getPtr()->getEventMgr());
 
@@ -189,18 +177,18 @@ void PlayScreen::enter()
 */
 }
 
-void PlayScreen::pause()
+void PlayScreen::Pause()
 {
   //  mTrayMgr->hideAll();
 }
 
-void PlayScreen::resume()
+void PlayScreen::Resume()
 {
     //mTrayMgr->showAll();
     //mTrayMgr->hideCursor();
 }
 
-void PlayScreen::leave()
+void PlayScreen::Leave()
 {/*
     mEntities->destroy_all();
     RenderManager::getPtr()->getSceneManager()->getRootSceneNode()->removeAndDestroyAllChildren();
@@ -210,21 +198,8 @@ void PlayScreen::leave()
     mTrayMgr = 0;
   */
 }
-/*
-void PlayScreen::keyPressed(const OIS::KeyEvent &evt)
-{
-    PlayerManager::getPtr()->handleKeyPressed(evt);
-}
 
-void PlayScreen::keyReleased(const OIS::KeyEvent &evt)
-{
-    if(evt.key == OIS::KC_ESCAPE)
-        ScreenManager::getPtr()->pushScreen(PauseScreen::getPtr());
-    else
-        PlayerManager::getPtr()->handleKeyReleased(evt);
-}*/
-
-void PlayScreen::update(double dt)
+void PlayScreen::Update(float dt)
 {/*
     Entity player = PlayerManager::getPtr()->getPlayerEntity();
     if(player.valid()){
@@ -241,29 +216,45 @@ void PlayScreen::update(double dt)
                               Ogre::StringConverter::toString(ScoreManager::getPtr()->getScore()));
   */
 }
-/*
-void PlayScreen::mouseMoved(const OIS::MouseEvent &evt)
+
+void PlayScreen::mouseMoved(const MouseMovedEvent& evt)
 {
     Screen::mouseMoved(evt);
-    PlayerManager::getPtr()->handleMouseMoved(evt);
+    PlayerManager::GetRef().handleMouseMoved(evt);
 }
 
-void PlayScreen::mousePressed(const OIS::MouseEvent &evt, OIS::MouseButtonID id)
+void PlayScreen::mousePressed(const MousePressedEvent& evt)
 {
-    Screen::mousePressed(evt, id);
-    PlayerManager::getPtr()->handleMousePressed(evt, id);
+    Screen::mousePressed(evt);
+    PlayerManager::GetRef().handleMousePressed(evt);
 }
 
-void PlayScreen::mouseReleased(const OIS::MouseEvent &evt, OIS::MouseButtonID id)
+void PlayScreen::mouseReleased(const MouseReleasedEvent& evt)
 {
-    Screen::mouseReleased(evt, id);
-    PlayerManager::getPtr()->handleMouseReleased(evt, id);
-}*/
+    Screen::mouseReleased(evt);
+    PlayerManager::GetRef().handleMouseReleased(evt);
+}
+
+void PlayScreen::keyPressed(const KeyPressedEvent& evt)
+{
+    PlayerManager::GetRef().handleKeyPressed(evt);
+}
+ 
+void PlayScreen::keyReleased(const KeyReleasedEvent& evt)
+{
+    using Key = Magnum::Platform::Sdl2Application::KeyEvent::Key;
+    
+    if (evt.key == Key::Esc) {
+        ScreenManager::GetRef().PushScreen<PauseScreen>();
+    } else {
+        PlayerManager::GetRef().handleKeyReleased(evt);
+    }
+}
 
 
 /**** PauseScreen *****/
 
-void PauseScreen::enter()
+void PauseScreen::Enter()
 {/*
     mEntities = entityx::EntityManager::make(MessageManager::getPtr()->getEventMgr());
 
@@ -277,17 +268,17 @@ void PauseScreen::enter()
   */
 }
 
-void PauseScreen::pause()
+void PauseScreen::Pause()
 {
     //mTrayMgr->hideAll();
 }
 
-void PauseScreen::resume()
+void PauseScreen::Resume()
 {
     //mTrayMgr->showAll();
 }
 
-void PauseScreen::leave()
+void PauseScreen::Leave()
 {/*
     mTrayMgr->destroyAllWidgets();
     delete mTrayMgr;
@@ -305,32 +296,35 @@ void PauseScreen::buttonHit(Button *button)
         mTrayMgr->showYesNoDialog("Quit the Game?","Do you want to quit?");
 
 }*/
-/*
-void PauseScreen::yesNoDialogClosed(const Ogre::DisplayString &question, bool yesHit)
-{
-    if( question == "Do you want to quit?" && yesHit)
-        MessageManager::getPtr()->emit<ShutDownEvent>();
-}*/
-/*
-void PauseScreen::keyPressed(const OIS::KeyEvent &evt)
-{
 
+void PauseScreen::YesNoDialogClosed(const std::string& question, bool yesHit)
+{
+    if (yesHit && question == "Do you want to quit?") {
+        MessageManager::GetRef().emit<ShutDownEvent>();
+    }
 }
 
-void PauseScreen::keyReleased(const OIS::KeyEvent &evt)
-{
-    if(evt.key == OIS::KC_ESCAPE)
-        ScreenManager::getPtr()->popScreen();
-}*/
 
-void PauseScreen::update(double dt)
+void PauseScreen::keyPressed(const KeyPressedEvent& evt)
 {
+}
 
+void PauseScreen::keyReleased(const KeyReleasedEvent& evt)
+{
+    using Key = Magnum::Platform::Sdl2Application::KeyEvent::Key;
+    
+    if (evt.key == Key::Esc) {
+        ScreenManager::GetRef().PopScreen();
+    }
+}
+
+void PauseScreen::Update(float dt)
+{
 }
 
 /**** GameOverScreen *****/
 
-void GameOverScreen::enter()
+void GameOverScreen::Enter()
 {/*
     mEntities = entityx::EntityManager::make(MessageManager::getPtr()->getEventMgr());
 
@@ -348,17 +342,17 @@ void GameOverScreen::enter()
 */
 }
 
-void GameOverScreen::pause()
+void GameOverScreen::Pause()
 {
     //mTrayMgr->hideAll();
 }
 
-void GameOverScreen::resume()
+void GameOverScreen::Resume()
 {
     //mTrayMgr->showAll();
 }
 
-void GameOverScreen::leave()
+void GameOverScreen::Leave()
 {/*
     mTrayMgr->destroyAllWidgets();
     delete mTrayMgr;
@@ -366,27 +360,23 @@ void GameOverScreen::leave()
 */
 }
 
-void GameOverScreen::update(double timeSinceLastFrame)
+void GameOverScreen::Update(float timeSinceLastFrame)
 {
-
     mTime -= timeSinceLastFrame;
-    std::cout << "Tempo rimasto: " << mTime << std::endl;
-    if( mTime <= 0 ){
+
+    LOGD("Tempo rimasto: " << mTime);
+
+    if (mTime <= 0) {
         mTime = screenDuration;
-        //ScoreManager::getPtr()->resetScore();
-        //ScreenManager::getPtr()->changeScreen(MenuScreen::getPtr());
+        ScoreManager::GetRef().ResetScore();
+        ScreenManager::GetRef().ChangeScreen<MenuScreen>();
     }
-
 }
-/*
-void GameOverScreen::keyPressed(const OIS::KeyEvent &evt)
-{
+
+void GameOverScreen::keyPressed(const KeyPressedEvent& evt) {
 
 }
 
-void GameOverScreen::keyReleased(const OIS::KeyEvent &evt)
-{
+void GameOverScreen::keyReleased(const KeyReleasedEvent& evt) {
 
 }
-*/
-

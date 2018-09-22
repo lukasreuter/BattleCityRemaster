@@ -2,13 +2,16 @@
 #include "MessageManager.h"
 #include "MapManager.h"
 #include "Components.h"
+#include "EntityManager.h"
 #include <sstream>
 //#include <OIS.h>
 #include <entt.hpp>
 
 void PlayerManager::init()
 {
-
+//    EntityManager::GetRegistry().
+    
+//    this->player =
 }
 
 void PlayerManager::setPlayerEntity(Entity player)
@@ -20,9 +23,10 @@ Entity PlayerManager::getPlayerEntity() const
 {
     return player;
 }
-/*
-void PlayerManager::handleKeyPressed(const OIS::KeyEvent &event)
+
+void PlayerManager::handleKeyPressed(const KeyPressedEvent& event)
 {
+    /*
     if(player.valid()){
         ptr<Velocity> vel = player.component<Velocity>();
         ptr<AngularVelocity> aVel = player.component<AngularVelocity>();
@@ -43,10 +47,12 @@ void PlayerManager::handleKeyPressed(const OIS::KeyEvent &event)
             break;
         }
     }
-}*/
-/*
-void PlayerManager::handleKeyReleased(const OIS::KeyEvent &event)
+     */
+}
+
+void PlayerManager::handleKeyReleased(const KeyReleasedEvent& event)
 {
+    /*
     if(player.valid()){
         ptr<Velocity> vel = player.component<Velocity>();
         ptr<AngularVelocity> aVel = player.component<AngularVelocity>();
@@ -66,11 +72,12 @@ void PlayerManager::handleKeyReleased(const OIS::KeyEvent &event)
             break;
         }
     }
-}*/
+     */
+}
 
-/*
-void PlayerManager::handleMouseMoved(const OIS::MouseEvent &event)
+void PlayerManager::handleMouseMoved(const MouseMovedEvent& event)
 {
+    /*
     if(player.valid()){
         //Componenti di orientamento del corpo e della torretta
         ptr<Orientation> bodyOri, ori;
@@ -113,18 +120,21 @@ void PlayerManager::handleMouseMoved(const OIS::MouseEvent &event)
         //ori = cannon.component<Orientation>();
         //ori->orientation = ori->orientation * qx;
     }
+     */
 }
 
-void PlayerManager::handleMousePressed(const OIS::MouseEvent &event, OIS::MouseButtonID id)
+void PlayerManager::handleMousePressed(const MousePressedEvent& event)
 {
 
 }
 
-void PlayerManager::handleMouseReleased(const OIS::MouseEvent &event, OIS::MouseButtonID id)
+void PlayerManager::handleMouseReleased(const MouseReleasedEvent& event)
 {
+    /*
     if(player.valid() && id == OIS::MB_Left)
         fire();
-}*/
+     */
+}
 
 void PlayerManager::fire()
 {/*

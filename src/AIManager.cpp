@@ -1,143 +1,134 @@
 #include "AIManager.h"
 #include "MapManager.h"
-#include "Components.h"
-#include "PlayerManager.h"
+#include "Logger.h"
+#include "EntityManager.h"
 #include "MessageManager.h"
-#include "CollisionManager.h"
-#include <time.h>
-#include <entt.hpp>
 
 
-void AIManager::init()
-{/*
-    entt::DefaultRegistry registry;
-    auto bla = registry.create();
-    auto op = registry.get<entt::label<"typename HashedString::hash_type Value"_hs>>();
-    registry.assign<entt::label<"enemy"_hs>>(bla);
+void AIManager::Init(entt::DefaultRegistry& registry)
+{
+    using namespace Magnum;
     
-    tankPlayer = PlayerManager::getPtr()->getPlayerEntity();
-  */
+    /// prepare the persistent view for the AI controlled entities
+    registry.prepare<Position, AI, Orientation, Velocity, AngularVelocity>();
+
+    LOGD(GREENBOLD << "AIManager" << RESET << "configured")
 }
 
-//! @todo: fix these
-void  AIManager::update(double dt)
-{/*
-    tankPlayer=PlayerManager::getPtr()->getPlayerEntity();
+void AIManager::Update(float dt, entt::DefaultRegistry& registry)
+{
+    using namespace Magnum;
+    constexpr int PlayerAIDistance = 36;
+    
+    //! @todo maybe remove this check and only execute the update when the player is there
+    if (!registry.has<Player>()) return;
+    
     srand(time(0));
-    if(tankPlayer.valid()){
-        ptr<EntityManager> entities = ScreenManager::getPtr()->getCurrentEntities();
-        for(auto entity : entities->entities_with_components<Position, AI,Orientation, Velocity, AngularVelocity>()){
-            ptr<Position> pos = entity.component<Position>();
-            ptr<Orientation> ori = entity.component<Orientation>();
-            ptr<Velocity> vel =entity.component<Velocity>();
-            ptr<AngularVelocity> angVel = entity.component<AngularVelocity>();
+    auto player = registry.attachee<Player>();
+    const Position& playerPos = registry.get<Position>(player);
+    static constexpr Rad oneDegree{Deg{1}};
+        
+    registry.view<Position, AI, Orientation, Velocity, AngularVelocity>(entt::persistent_t{}).each([this, &playerPos, player, dt](auto entity, auto& pos, auto& ai, auto& ori, auto& velocity, auto& angular)
+    {
+        float dist = (playerPos.position - pos.position).length();
+        Vector3 diff = pos.position - playerPos.position;
+        
+        Rad theta = Math::angle(ori.orientation.transformVector(Vector3::zAxis()).normalized(), diff.normalized());
+        
+        //se la distanza dal nemico è < di una soglia data e il nemico non è sotto tiro
+        //punta il nemico
 
-            //delta= (vel->velocity * vel->direction);
-
-            ptr<Position> playerPos = tankPlayer.component<Position>();
-
-            Ogre::Real dist = playerPos->position.distance(pos->position);
-            Ogre::Vector3 diff = pos->position-playerPos->position;
-            Ogre::Radian theta = (ori->orientation.zAxis()).angleBetween(diff);
-
-            //se la distanza dal nemico è < di una soglia data e il nemico non è sotto tiro
-            //punta il nemico
-
-            if(abs(dist)<70 && theta.valueDegrees()>1){
-                seek(vel,angVel,ori,diff,theta,dt);
-                //return;
-            }
-
-            //se il nemico è sottotiro spara
-            if(abs(dist)<36 && theta.valueDegrees()<=1){
-                fire(entity,tankPlayer);
-                return;
-            }
-
-            if(abs(dist)>36)
-                walk(vel,ori,angVel,pos,dt);
-
+        if (abs(dist) < 70 && theta > oneDegree)
+        {
+            Seek(velocity, angular, ori, diff, theta, dt);
+//            return;
         }
-    }
-  */
+
+        //se il nemico è sottotiro spara
+        if (abs(dist) < PlayerAIDistance && theta <= oneDegree)
+        {
+            Fire(entity, player);
+            return;
+        }
+
+        if (abs(dist) > PlayerAIDistance) {
+            Walk(velocity, ori, angular, pos, dt);
+        }
+    });
 }
 
-void AIManager::seek(Velocity& vel, AngularVelocity& angleVel, Orientation& ori, Magnum::Vector3 diff, Magnum::Rad theta, double dt) {
-    /*
-    Ogre::Quaternion newOri;
-    Ogre::Quaternion qy;
-
-    qy=Ogre::Quaternion(Ogre::Degree(theta*dt), Ogre::Vector3::UNIT_Y);
-    if((ori->orientation*qy).zAxis().angleBetween(diff)>theta)
-        //qy=Ogre::Quaternion(Ogre::Degree(-theta*dt), Ogre::Vector3::UNIT_Y);
-        angleVel->direction=-1;
+void AIManager::Seek(Velocity& vel, AngularVelocity& angleVel, Orientation& ori, Magnum::Vector3 diff, Magnum::Rad theta, float dt)
+{
+    using namespace Magnum;
+    
+    Quaternion qy{Vector3::yAxis(), float(theta) * dt};
+    
+    if(Math::angle((ori.orientation * qy).transformVector(Vector3::zAxis()), diff.normalized()) > theta)
+        angleVel.direction = Vector3{-1};
     else
-        angleVel->direction=1;
-    vel->direction.z=0;
-
-    //newOri = ori->orientation*qy;
-
-    //ori->orientation = newOri;
-
-    return;
-     */
+        angleVel.direction = Vector3{1};
+    vel.direction.z() = 0;
 }
 
-void AIManager::walk(Velocity& vel, Orientation& ori, AngularVelocity& angVel, Position& pos, double dt){
-    /*
-    Ogre::Vector3 delta(0,0,-1);
-    Ogre::Vector3 delta2(0,0,-1);
-    delta = ((vel->velocity * Ogre::Vector3(0,0,-1)) * dt);
-    delta = ori->orientation * delta;
-    delta2 = (((vel->velocity*10) * delta2) * dt);
-    delta2 = ori->orientation * delta2;
-    MapManager *map = MapManager::getPtr();
+void AIManager::Walk(Velocity& vel, Orientation& ori, AngularVelocity& angVel, Position& pos, double dt)
+{
+    using namespace Magnum;
+    
+    Vector3 backVector{0, 0, -1};
+    Vector3 delta = ori.orientation.transformVector((vel.velocity * backVector) * dt);
+    Vector3 delta10 = ori.orientation.transformVector(((vel.velocity * 10) * backVector) * dt);
+    const MapManager& map = MapManager::GetRef();
 
     //std::cout<<map->collide(*(pos.get()),delta,*(ori.get()),"haha")<<std::endl;
-    if((map->collide(*(pos.get()),delta,*(ori.get()))==0)&&(map->collide(*(pos.get()),delta2,*(ori.get()))==0)){
-        vel->direction=Ogre::Vector3(0,0,-1);
+    if ((map.Collide(pos, delta, ori) == 0) && (map.Collide(pos, delta10, ori) == 0))
+    {
+        vel.direction = Vector3{0, 0, -1};
       //  angVel->direction=Ogre::Vector3(0,0,0);
 
-        if(rand()%1000<10)
+        if (rand() % 1000 < 10)
         {
-            int dir=rand()%2;
-            if(dir==0)
-                dir=-1;
-            if(angVel->direction.y==0)
-                angVel->direction.y=dir;
+            int dir = rand() % 2;
+            if (dir == 0)
+                dir = -1;
+            if (angVel.direction.y() == 0)
+                angVel.direction.y() = dir;
         }
         return;
     }
-    if(angVel->direction.y==0){
-        vel->direction=Ogre::Vector3(0,0,0);
+    if (angVel.direction.y() == 0)
+    {
+        vel.direction = Vector3{0, 0, 0};
 
-        int dir=rand()%10;
-        if(dir<5){
-            dir=-1;
-        }
-        else{
-            dir=1;
-        }
+        int dir = rand() % 10;
+        dir = (dir < 5) ? -1 : 1;
 
-        angVel->direction.y=dir;
+        angVel.direction.y() = dir;
     }
-     */
 }
 
-void AIManager::fire(Entity start,Entity end){
-    /*
-    ptr<OverHeating> overH = start.component<OverHeating>();
-    start.component<Velocity>()->direction.z=0;
-    start.component<AngularVelocity>()->direction.y=0;
-    if(overH->overheating<=0)
+void AIManager::Fire(Entity start, Entity end)
+{
+    //! @todo check if the entities have all the required components
+    
+    auto& registry = EntityManager::Registry();
+    if (!registry.has<OverHeating>(start)) return;
+    
+    auto& overH = registry.get<OverHeating>(start);
+    registry.get<Velocity>(start).direction.z() = 0;
+    registry.get<AngularVelocity>(start).direction.y() = 0;
+    
+    if (overH.overheating <= 0) {
         return;
-    else {
-        start.assign<OverHeating>(overH->overheating-overH->shootHeating,overH->shootHeating,overH->maxheating);
-
-        MessageManager::getPtr()->emit<ShootEvent>(start,start.component<Position>(),start.component<Orientation>(),start.component<Children>()->children["turret"].component<Orientation>(),"Player");
-
-    }// if(MapManager::getPtr()->fireCollision(start.component<Position>(),start.component<Orientation>(),"PlayerTankBody"))
+    } else {
+        overH.overheating -= overH.shootHeating;
+        auto& pos = registry.get<Position>(start);
+        auto& ori = registry.get<Orientation>(start);
+        auto& children = registry.get<Children>(start);
+        auto& turret = registry.get<Orientation>(children.children["turret"]);
+        
+        MessageManager::GetRef().emit<ShootEvent>(start, pos, ori, turret, "Player");
+    }
+    // if(MapManager::getPtr()->fireCollision(start.component<Position>(),start.component<Orientation>(),"PlayerTankBody"))
    //     std::cout<<"Colpito!"<<std::endl;
     return;
-     */
 }

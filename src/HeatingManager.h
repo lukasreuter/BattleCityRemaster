@@ -1,11 +1,11 @@
 #pragma once
 
+#include <entity/registry.hpp>
 #include "Singleton.h"
-#include "ManagerInterface.h"
 
 
 class HeatingManager : public Singleton<HeatingManager>
 {
 public:
-    void Update(milliseconds dt, entt::DefaultRegistry& registry);
+    void Update(float dt, entt::DefaultRegistry& registry);
 };

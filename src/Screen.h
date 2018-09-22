@@ -1,29 +1,29 @@
-#ifndef SCREEN_H
-#define SCREEN_H
-//#include <SdkTrays.h>
-//#include "entityx.h"
+#pragma once
+
+#include "Messages.h"
 #include "Singleton.h"
 
 
-class Screen// : public OgreBites::SdkTrayListener
+class Screen
 {
 public:
-    Screen() {}
-    virtual void enter() = 0;
-    virtual void pause() = 0;
-    virtual void resume() = 0;
-    virtual void leave() = 0;
+    Screen() = default;
+    virtual ~Screen() = default;
 
-    virtual void update(double dt) = 0;
+    virtual void Enter() = 0;
+    virtual void Pause() = 0;
+    virtual void Resume() = 0;
+    virtual void Leave() = 0;
+    virtual void Update(float dt) = 0;
 
-    /*! @todo reenable these
-    virtual void keyPressed(const OIS::KeyEvent &evt) = 0;
-    virtual void keyReleased(const OIS::KeyEvent &evt) = 0;
-    virtual void mouseMoved(const OIS::MouseEvent &evt);
-    virtual void mousePressed(const OIS::MouseEvent &evt, OIS::MouseButtonID id);
-    virtual void mouseReleased(const OIS::MouseEvent &evt, OIS::MouseButtonID id);
+    virtual void keyPressed(const KeyPressedEvent& evt) = 0;
+    virtual void keyReleased(const KeyReleasedEvent& evt) = 0;
+    virtual void mouseMoved(const MouseMovedEvent& evt);
+    virtual void mousePressed(const MousePressedEvent& evt);
+    virtual void mouseReleased(const MouseReleasedEvent& evt);
 
 
+     /*
     entityx::ptr<entityx::EntityManager> getEntities() { return mEntities; }
     OgreBites::SdkTrayManager *getTrayMgr() { return mTrayMgr; }
 
@@ -36,37 +36,40 @@ protected:
 
 
 
-class MenuScreen : public Screen, public Singleton<MenuScreen>
+class MenuScreen : public Screen
 {
 public:
-    MenuScreen(){}
-    void enter();
-    void pause();
-    void resume();
-    void leave();
-    void update(double dt);
+    MenuScreen() = default;
+
+    void Enter() final;
+    void Pause() final;
+    void Resume() final;
+    void Leave() final;
+    void Update(float dt) final;
     //void buttonHit(OgreBites::Button *button);
     //void yesNoDialogClosed(const Ogre::DisplayString &question, bool yesHit);
-    //void keyPressed(const OIS::KeyEvent &evt);
-    //void keyReleased(const OIS::KeyEvent &evt);
+    void keyPressed(const KeyPressedEvent& evt) final;
+    void keyReleased(const KeyReleasedEvent& evt) final;
+
 private:
-    bool change;
+    bool change = false;
 };
 
-class PlayScreen : public Screen, public Singleton<PlayScreen>
+class PlayScreen : public Screen
 {
 public:
-    PlayScreen() {}
-    void enter();
-    void pause();
-    void resume();
-    void leave();
-    void update(double dt);
-    //void keyPressed(const OIS::KeyEvent &evt);
-    //void keyReleased(const OIS::KeyEvent &evt);
-    //void mouseMoved(const OIS::MouseEvent &evt);
-    //void mousePressed(const OIS::MouseEvent &evt, OIS::MouseButtonID id);
-    //void mouseReleased(const OIS::MouseEvent &evt, OIS::MouseButtonID id);
+    PlayScreen() = default;
+
+    void Enter() final;
+    void Pause() final;
+    void Resume() final;
+    void Leave() final;
+    void Update(float dt) final;
+    void keyPressed(const KeyPressedEvent& evt) final;
+    void keyReleased(const KeyReleasedEvent& evt) final;
+    void mouseMoved(const MouseMovedEvent& evt) final;
+    void mousePressed(const MousePressedEvent& evt) final;
+    void mouseReleased(const MouseReleasedEvent& evt) final;
 
 private:
     //OgreBites::ParamsPanel *mInfoPanel;
@@ -74,37 +77,39 @@ private:
     //OgreBites::ProgressBar *mHeatBar;
 };
 
-class PauseScreen : public Screen, public Singleton<PauseScreen>
+class PauseScreen : public Screen
 {
 public:
-    PauseScreen() {}
-    void enter();
-    void pause();
-    void resume();
-    void leave();
-    void update(double dt);
-    //void keyPressed(const OIS::KeyEvent &evt);
-    //void keyReleased(const OIS::KeyEvent &evt);
+    PauseScreen() = default;
+
+    void Enter() final;
+    void Pause() final;
+    void Resume() final;
+    void Leave() final;
+    void Update(float dt) final;
+    
+    void keyPressed(const KeyPressedEvent& evt) final;
+    void keyReleased(const KeyReleasedEvent& evt) final;
+    
     //void buttonHit(OgreBites::Button *button);
-    //void yesNoDialogClosed(const Ogre::DisplayString &question, bool yesHit);
+    void YesNoDialogClosed(const std::string& question, bool yesHit);
 };
 
-class GameOverScreen : public Screen, public Singleton<GameOverScreen>
+class GameOverScreen : public Screen
 {
 public:
-    GameOverScreen() {}
-    void enter();
-    void pause();
-    void resume();
-    void leave();
+    GameOverScreen() = default;
 
-    void update(double dt);
+    void Enter() final;
+    void Pause() final;
+    void Resume() final;
+    void Leave() final;
+    void Update(float dt) final;
 
-    //void keyPressed(const OIS::KeyEvent &evt);
-    //void keyReleased(const OIS::KeyEvent &evt);
+    void keyReleased(const KeyReleasedEvent& evt) final;
+    void keyPressed(const KeyPressedEvent& evt) final;
 
 private:
     static constexpr double screenDuration = 5;
-    double mTime;
+    double mTime = 0;
 };
-#endif // SCREEN_H

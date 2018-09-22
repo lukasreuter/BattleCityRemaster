@@ -1,31 +1,27 @@
 #pragma once
 
-#include <entt.hpp>
 #include "Singleton.h"
-#include "Messages.h"
 #include "Components.h"
-//#include "Ogre.h"
-
 #include <Magnum/Magnum.h>
 #include <Magnum/Math/Vector3.h>
+#include <entt.hpp>
 
 
 class AIManager : public Singleton<AIManager>
 {
+    using Entity = entt::DefaultRegistry::entity_type;
+    
 public:
-    void init();
-    void update(double dt);
+    void Init(entt::DefaultRegistry& registry);
+    void Update(float dt, entt::DefaultRegistry& registry);
 /*
 private:
     entt::::Entity tankPlayer;
     entityx::EventManager* events;
 
  */
-    using Entity = entt::DefaultRegistry::entity_type;
     
-    void seek(Velocity& vel,AngularVelocity& angVel,Orientation& ori, Magnum::Vector3 diff, Magnum::Rad theta, double dt);
-    void walk(Velocity& vel,Orientation& ori,AngularVelocity& angVel,Position& pos, double dt);
-    //void fire(entityx::Entity start, entityx::Entity end);
-    void fire(Entity start, Entity end);
-
+    void Seek(Velocity& vel, AngularVelocity& angVel, Orientation& ori, Magnum::Vector3 diff, Magnum::Rad theta, float dt);
+    void Walk(Velocity& vel, Orientation& ori, AngularVelocity& angVel, Position& pos, double dt);
+    void Fire(Entity start, Entity end);
 };

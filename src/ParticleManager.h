@@ -29,7 +29,7 @@ public:
     void init();
     void receive(const ShootEvent &);
     void receive(const ObjectDestroyed &);
-    void update(double dt);
+    void Update(float dt);
 private:
     void createEmitter(std::string name, entt::DefaultRegistry::entity_type ent);
 

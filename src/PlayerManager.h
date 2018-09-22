@@ -13,12 +13,13 @@ public:
     void init();
     void setPlayerEntity(Entity player);
     Entity getPlayerEntity() const;
-    //! @todo re-enable these
-    /*void handleKeyPressed(const OIS::KeyEvent &event);
-    void handleKeyReleased(const OIS::KeyEvent &event);
-    void handleMouseMoved(const OIS::MouseEvent &event);
-    void handleMousePressed(const OIS::MouseEvent &event, OIS::MouseButtonID id);
-    void handleMouseReleased(const OIS::MouseEvent &event, OIS::MouseButtonID id);*/
+    
+    void handleKeyPressed(const KeyPressedEvent& event);
+    void handleKeyReleased(const KeyReleasedEvent& event);
+    void handleMouseMoved(const MouseMovedEvent& event);
+    void handleMousePressed(const MousePressedEvent& event);
+    void handleMouseReleased(const MouseReleasedEvent& event);
+    
 private:
     Entity player;
     void fire();

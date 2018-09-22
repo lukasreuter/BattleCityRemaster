@@ -6,52 +6,35 @@
 
 ScreenManager::~ScreenManager()
 {
-/*
-    while (!mScreens.empty()){
-        mScreens.back()->leave();
-        mScreens.pop_back();
+    while (!_screens.empty()) {
+        _screens.back()->Leave();
+        _screens.pop_back();
     }
- */
 }
 
-void ScreenManager::init(Screen *initialScreen)
-{/*
-    RenderManager::getPtr()->setFrameListener(this);
-    MessageManager::getPtr()->subscribe<KeyPressedEvent>(*this);
-    MessageManager::getPtr()->subscribe<KeyReleasedEvent>(*this);
-    MessageManager::getPtr()->subscribe<MouseMovedEvent>(*this);
-    MessageManager::getPtr()->subscribe<MousePressedEvent>(*this);
-    MessageManager::getPtr()->subscribe<MouseReleasedEvent>(*this);
-    Ogre::FontManager::getSingleton().getByName("SdkTrays/Caption")->load();
-    pushScreen(initialScreen);
-  */
-}
-
-void ScreenManager::pushScreen(Screen *screen)
+void ScreenManager::Init(Screen *initialScreen)
 {
-    if(!mScreens.empty())
-        mScreens.back()->pause();
-
-    mScreens.push_back(screen);
-    screen->enter();
+    auto& messenger = MessageManager::GetRef();
+    messenger.subscribe<KeyPressedEvent>(this);
+    messenger.subscribe<KeyReleasedEvent>(this);
+    messenger.subscribe<MouseMovedEvent>(this);
+    messenger.subscribe<MousePressedEvent>(this);
+    messenger.subscribe<MouseReleasedEvent>(this);
+    //Ogre::FontManager::getSingleton().getByName("SdkTrays/Caption")->load();
+    //pushScreen(initialScreen);
 }
 
-void ScreenManager::popScreen()
+void ScreenManager::PopScreen()
 {
-    if(!mScreens.empty()){
-        mScreens.back()->leave();
-        mScreens.pop_back();
+    if (!_screens.empty()) {
+        _screens.back()->Leave();
+        _screens.pop_back();
     }
 
-    if(!mScreens.empty())
-        mScreens.back()->resume();
+    if (!_screens.empty())
+        _screens.back()->Resume();
 }
 
-void ScreenManager::changeScreen(Screen *screen)
-{
-    popScreen();
-    pushScreen(screen);
-}
 /*
 bool ScreenManager::frameRenderingQueued(const Ogre::FrameEvent &evt)
 {
@@ -63,28 +46,11 @@ bool ScreenManager::frameRenderingQueued(const Ogre::FrameEvent &evt)
     return true;
 }
 */
-void ScreenManager::resetTo(Screen *screen)
-{
-    while (!mScreens.empty()){
-        mScreens.back()->leave();
-        mScreens.pop_back();
-    }
-    pushScreen(screen);
-}
-/*
-entityx::ptr<entityx::EntityManager> ScreenManager::getCurrentEntities()
-{
-    if(!mScreens.empty()){
-        Screen* curr = mScreens.back();
-        return curr->getEntities();
-    }
 
-}*/
-
-void ScreenManager::update(double dt)
+void ScreenManager::Update(float dt)
 {
-    if(!mScreens.empty()){
-        mScreens.back()->update(dt);
+    if (!_screens.empty()) {
+        _screens.back()->Update(dt);
     }
 }
 
@@ -99,13 +65,11 @@ void ScreenManager::receive(const KeyPressedEvent &event)
 */
 }
 
-void ScreenManager::receive(const KeyReleasedEvent &event)
-{/*
-    if(!mScreens.empty()){
-        Screen* curr = mScreens.back();
-        curr->keyReleased(event.event);
+void ScreenManager::receive(const KeyReleasedEvent& event)
+{
+    if (!_screens.empty()) {
+        _screens.back()->keyReleased(event);
     }
-*/
 }
 
 void ScreenManager::receive(const MouseMovedEvent &event)
@@ -128,7 +92,7 @@ void ScreenManager::receive(const MousePressedEvent &event)
 
 void ScreenManager::receive(const MouseReleasedEvent &event)
 {
-    if(!mScreens.empty()){
+    if(!_screens.empty()){
  //       mScreens.back()->mouseReleased(event.event, event.buttonID);
     }
 }

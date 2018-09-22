@@ -1,41 +1,60 @@
 #pragma once
 
 #include "Screen.h"
-//#include <Ogre.h>
-#include "Messages.h"
 #include "Singleton.h"
 #include <entt.hpp>
 #include <vector>
 
 
-class ScreenManager : /*public entityx::Receiver<ScreenManager>, */public Singleton<ScreenManager>//, public Ogre::FrameListener
+class ScreenManager : public Singleton<ScreenManager>
 {
 public:
     ScreenManager() = default;
     ~ScreenManager();
 
-    void init(Screen* initialScreen);
+    void Init(Screen *initialScreen);
 
 
-    void pushScreen(Screen* screen);
-    void popScreen();
-    void changeScreen(Screen* screen);
-    void resetTo(Screen* screen);
+    template <typename T>
+    void PushScreen()
+    {
+        if (!_screens.empty())
+            _screens.back()->Pause();
 
-    void update(double dt);
+        _screens.push_back(std::make_unique<T>());
+        _screens.back()->Enter();
+    }
+
+    void PopScreen();
+
+    template <typename T>
+    void ChangeScreen()
+    {
+        PopScreen();
+        PushScreen<T>();
+    }
+
+    template <typename T>
+    void ResetTo()
+    {
+        while (!_screens.empty()) {
+            _screens.back()->Leave();
+            _screens.pop_back();
+        }
+
+        PushScreen<T>();
+    }
+
+    void Update(float dt);
 
     //bool frameRenderingQueued(const Ogre::FrameEvent &evt);
 
-    //entityx::ptr<entityx::EntityManager> getCurrentEntities();
-    
-    entt::DefaultRegistry& GetEntityRegistry() const;
-
-    void receive(const KeyPressedEvent& event);
-    void receive(const KeyReleasedEvent& event);
-    void receive(const MouseMovedEvent& event);
-    void receive(const MousePressedEvent& event);
-    void receive(const MouseReleasedEvent& event);
+    void receive(const struct KeyPressedEvent& event);
+    void receive(const struct KeyReleasedEvent& event);
+    void receive(const struct MouseMovedEvent& event);
+    void receive(const struct MousePressedEvent& event);
+    void receive(const struct MouseReleasedEvent& event);
 
 private:
-    std::vector<Screen*> mScreens;
+    std::vector<std::unique_ptr<Screen>> _screens;
 };

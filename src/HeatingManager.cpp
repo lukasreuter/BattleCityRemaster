@@ -4,8 +4,10 @@
 
 void HeatingManager::Update(float dt, entt::DefaultRegistry& registry)
 {
-    registry.view<OverHeating>().each([dt](auto entity, auto& overHeatingComp) {
-        if (overHeatingComp.overheating < overHeatingComp.maxheating){
+    registry.view<OverHeating>(entt::raw_t{}).each([dt] (auto& overHeatingComp)
+    {
+        if (overHeatingComp.overheating < overHeatingComp.maxheating)
+        {
             overHeatingComp.overheating += dt;
         }
     });

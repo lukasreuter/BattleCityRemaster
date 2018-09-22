@@ -6,7 +6,9 @@
 class DebugManager : public Singleton<DebugManager>
 {
 public:
-    void init();
+    DebugManager() noexcept;
+    ~DebugManager();
+    
     void receive(const struct KeyPressedEvent& event);
     void receive(const struct KeyReleasedEvent& event);
     void receive(const struct MouseMovedEvent& event);

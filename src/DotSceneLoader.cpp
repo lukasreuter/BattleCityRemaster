@@ -4,12 +4,12 @@
 //#include <Terrain/OgreTerrainGroup.h>
 //#include <Terrain/OgreTerrainMaterialGeneratorA.h>
 
-#pragma warning(disable:4390)
-#pragma warning(disable:4305)
+//#pragma warning(disable:4390)
+//#pragma warning(disable:4305)
 
 //TODO:
 
-DotSceneLoader::DotSceneLoader() : mSceneMgr(0), mTerrainGroup(0)
+DotSceneLoader::DotSceneLoader() : mSceneMgr(nullptr), mTerrainGroup(0)
 {
     //mTerrainGlobalOptions = OGRE_NEW Ogre::TerrainGlobalOptions();
 }

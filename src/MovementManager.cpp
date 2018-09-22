@@ -1,74 +1,61 @@
 #include "MovementManager.h"
 #include "CollisionManager.h"
-#include "Components.h"
 #include "ScreenManager.h"
 #include "MessageManager.h"
+#include "Logger.h"
 
-//using namespace entityx;
 
-MovementManager::MovementManager()
+void MovementManager::Init(entt::DefaultRegistry& registry)
 {
+    registry.prepare<Position, Orientation>();
+    
+    LOGD("MovementManager configured")
 }
 
-
-void MovementManager::init()
+void MovementManager::Update(float dt, entt::DefaultRegistry& registry)
 {
+    using namespace Magnum;
+    
+    Vector3 delta;
+    
+    registry.view<Position, Orientation>(entt::persistent_t{}).each([&registry, &delta, dt] (auto entity, auto& pos, auto& ori)
+    {
+        std::string name = registry.get<Name>(entity).name;
 
-}
+        MessageManager::GetRef().emit<MoveEvent>(pos.position.x(), pos.position.y(), pos.position.z());
+        
+        if (registry.has<AngularVelocity>())
+        {
+            const auto& angVel = registry.get<AngularVelocity>(entity);
+            delta = (angVel.angularVelocity * angVel.direction) * dt;
+            Quaternion qx{Vector3::xAxis(), float(Deg{delta.x()})};
+            Quaternion qy{Vector3::yAxis(), float(Deg{delta.y()})};
+            Quaternion qz{Vector3::zAxis(), float(Deg{delta.z()})};
 
-void MovementManager::update(double dt)
-{/* TODO:
-    Ogre::Vector3 delta;
-    CollisionManager *colMgr=CollisionManager::getPtr();
-    ptr<EntityManager> entities = ScreenManager::getPtr()->getCurrentEntities();
-    for( auto entity : entities->entities_with_components<Position, Orientation, Velocity, AngularVelocity>()){
-        ptr<Position> pos = entity.component<Position>();
-        ptr<Orientation> ori = entity.component<Orientation>();
-        ptr<Velocity> vel = entity.component<Velocity>();
-        ptr<AngularVelocity> angVel = entity.component<AngularVelocity>();
-       // ptr<Renderable> rend = entity.component<Renderable>();
-        Ogre::String name = entity.component<Name>()->name;
-
-        MessageManager::getPtr()->emit<MoveEvent>(pos->position.x, pos->position.y, pos->position.z);
-        if(angVel){
-            delta = (angVel->angularVelocity * angVel->direction) * dt;
-            Ogre::Quaternion qx(Ogre::Degree(delta.x), Ogre::Vector3::UNIT_X);
-            Ogre::Quaternion qy(Ogre::Degree(delta.y), Ogre::Vector3::UNIT_Y);
-            Ogre::Quaternion qz(Ogre::Degree(delta.z), Ogre::Vector3::UNIT_Z);
-
-            //Orientation newOri=ori->orientation * qx * qy * qz;
-            //if(colMgr->collide(*(pos.get()),delta,newOri,name)==false)
-
-                   ori->orientation = (ori->orientation * qx * qy * qz);
-            //std::cout << "Arrotamento: " << delta << std::endl;
-            //std::cout << "Quaterniono: " << ori->orientation << std::endl;
+            ori.orientation = ori.orientation * qx * qy * qz;
         }
 
-
-        if(vel){
-            delta = ((vel->velocity * vel->direction) * dt);
-            delta = ori->orientation * delta;
+        if (registry.has<Velocity>(entity))
+        {
+            const auto& vel = registry.get<Velocity>(entity);
+            delta = (vel.velocity * vel.direction) * dt;
+            delta = ori.orientation.transformVector(delta);
             //sposta se non ci sono collisioni
 
-            bool collided = colMgr->collide(*(pos.get()),delta,*(ori.get()),name);
+            bool collided = CollisionManager::Collide(pos, delta, ori, name);
 
-            if(!collided)
-                pos->position = pos->position + delta;
+            if (!collided) {
+                pos.position += delta;
+            } else if(name == "proiettile"){/*
+                ptr<Renderable> rend = entity.component<Renderable>();
 
-            else if(name == "proiettile"){
-                    ptr<Renderable> rend = entity.component<Renderable>();
+                Ogre::MovableObject* light = entity.component<LightComponent>()->light;
+                RenderManager::getPtr()->getSceneManager()->destroyMovableObject(light);
 
-                    Ogre::MovableObject* light = entity.component<LightComponent>()->light;
-                    RenderManager::getPtr()->getSceneManager()->destroyMovableObject(light);
-
-                    RenderManager::getPtr()->getSceneManager()->destroySceneNode(rend->sceneNode->getName());
-                    entity.destroy();
+                RenderManager::getPtr()->getSceneManager()->destroySceneNode(rend->sceneNode->getName());
+                entity.destroy();
+             */
             }
         }
-        //std::cout << "Spostamento: " << delta << std::endl;
-
-
-    }
-  */
+    });
 }
-

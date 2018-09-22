@@ -3,19 +3,34 @@
 #include "Logger.h"
 
 
-void DebugManager::init()
-{/*
-    events->subscribe<KeyPressedEvent>(*this);
-    logManager = Ogre::LogManager::getSingletonPtr();
-    logManager->createLog("Battlecity.log",false,false,false);
-  */
+DebugManager::DebugManager() noexcept
+{
+#ifdef DEBUG_INPUT
+    /// only activate the debugging features when actually in a debug build
+    auto& messenger = MessageManager::GetRef();
+    messenger.subscribe<KeyPressedEvent>(this);
+    messenger.subscribe<MoveEvent>(this);
+    
+    LOGD("DebugManager configured")
+#endif
+}
+
+DebugManager::~DebugManager()
+{
+#ifdef DEBUG_INPUT
+    auto& messenger = MessageManager::GetRef();
+    messenger.unsubscribe<KeyPressedEvent>(this);
+    messenger.unsubscribe<MoveEvent>(this);
+    
+    LOGD("DebugManager destroyed")
+#endif
 }
 
 void DebugManager::receive(const KeyPressedEvent &event)
 {
     auto keyName = Magnum::Platform::Sdl2Application::KeyEvent::keyName(event.key);
     
-    LOGD("Premuto " << keyName)
+    LOGD("Pressed: " << keyName)
 }
 
 void DebugManager::receive(const MoveEvent &event)

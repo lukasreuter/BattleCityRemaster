@@ -4,8 +4,8 @@
 #include "Components.h"
 #include <string>
 
-class CollisionManager : Singleton<CollisionManager>
+class CollisionManager : public Singleton<CollisionManager>
 {
 public:
-    static bool Collide(Position pos, Magnum::Vector3 delta, Orientation ori, std::string name);
+    static bool Collide(const Position& pos, const Magnum::Vector3& delta, const Orientation& ori, std::string name);
 };

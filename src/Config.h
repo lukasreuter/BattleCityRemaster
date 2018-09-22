@@ -6,7 +6,9 @@
 //
 #pragma once
 
-#define DEBUG
+// wether we should print debugging information
+#define DEBUG_LOG
+// wether we should log every input and print it
 #define DEBUG_INPUT
 //define PROFILING
 

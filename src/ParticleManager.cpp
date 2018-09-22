@@ -8,7 +8,12 @@ ParticleManager::ParticleManager()
 
 
 void ParticleManager::init()
-{/*
+{
+    auto& messenger = MessageManager::GetRef();
+    messenger.subscribe<ShootEvent>(this);
+    messenger.subscribe<ObjectDestroyed>(this);
+    
+    /*
     MessageManager::getPtr()->subscribe<ShootEvent>(*this);
     MessageManager::getPtr()->subscribe<ObjectDestroyed>(*this);
     timeSinceLastDelete = 0;
@@ -37,10 +42,11 @@ void ParticleManager::receive(const ObjectDestroyed &evt)
   */
 }
 
-void ParticleManager::update(double dt)
-{/*
+void ParticleManager::Update(float dt)
+{
+    /*
     timeSinceLastDelete += dt;
-    if(timeSinceLastDelete >= deleteInterval && !emitters.empty())
+    if (timeSinceLastDelete >= deleteInterval && !emitters.empty())
     {
         Ogre::ParticleEmitter *pe = emitters.front();
 

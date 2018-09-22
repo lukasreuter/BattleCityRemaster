@@ -1,32 +1,35 @@
 #include "ScoreManager.h"
-#include "PlayerManager.h"
+#include "Logger.h"
+#include "EntityManager.h"
 #include "ScreenManager.h"
-#include "Screen.h"
-#include <entt.hpp>
 
 
 ScoreManager::ScoreManager() noexcept
 {
     MessageManager::GetRef().subscribe<ObjectDestroyed>(this);
+
+    LOGD(GREENBOLD << "ScoreManager" << RESET << " configured")
 }
 
 ScoreManager::~ScoreManager()
 {
     MessageManager::GetRef().unsubscribe<ObjectDestroyed>(this);
+
+    LOGD(GREENBOLD << "ScoreManager" << RESET << " teardown")
 }
 
 void ScoreManager::receive(const ObjectDestroyed& event)
 {
-    entt::DefaultRegistry reg{};
-    auto de = reg.create();
+    auto& reg = EntityManager::Registry();
     
     Entity obj = event.object;
-    /*if(obj == PlayerManager::GetRef().getPlayerEntity())
-        ScreenManager::getPtr()->resetTo(GameOverScreen::getPtr());
-    else if(obj.component<Name>()->name != "Block")
-    {
+    Entity player = reg.attachee<Player>();
+
+    if (obj == player) {
+        ScreenManager::GetRef().ResetTo<GameOverScreen>();
+    } else if (auto name = reg.has<Name>() ? reg.get<Name>().name : ""; name != "Block") {
         score += unitScore;
-    }*/
+    }
 }
 
 

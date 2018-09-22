@@ -1,125 +1,34 @@
 #include "InputManager.h"
-#include "Messages.h"
 #include "MessageManager.h"
-InputManager::InputManager(){}
+#include "Logger.h"
 
-InputManager::~InputManager()
+
+InputManager::InputManager()
 {
-    /*
-    if(mInputMgr)
-    {
-        if(mMouse)
-        {
-            mInputMgr->destroyInputObject(mMouse);
-            mMouse = 0;
-        }
-
-        if(mKeyboard)
-        {
-            mInputMgr->destroyInputObject(mKeyboard);
-            mKeyboard = 0;
-        }
-
-        mInputMgr->destroyInputSystem(mInputMgr);
-        mInputMgr = 0;
-    }
-*/
-
+    LOGD(GREENBOLD << "InputManger" << RESET << "configured")
 }
 
-void InputManager::init()
+void InputManager::keyPressed(const KeyEvent &arg)
 {
-    /*
-    OIS::ParamList pl;
-    Ogre::RenderWindow* window = RenderManager::getPtr()->getRenderWindow();
-
-    std::ostringstream windowHndStr;
-    size_t windowHnd = 0;
-
-    window->getCustomAttribute("WINDOW", &windowHnd);
-
-    windowHndStr << windowHnd;
-
-    pl.insert(std::make_pair(std::string("WINDOW"),windowHndStr.str()));
-    pl.insert(std::make_pair(std::string("x11_mouse_grab"), std::string("false")));
-    //pl.insert(std::make_pair(std::string("x11_keyboard_grab"), std::string("false")));
-
-    mInputMgr = OIS::InputManager::createInputSystem(pl);
-
-    mKeyboard = static_cast<OIS::Keyboard*>(mInputMgr->createInputObject(OIS::OISKeyboard, true));
-    mMouse = static_cast<OIS::Mouse*>(mInputMgr->createInputObject(OIS::OISMouse, true));
-
-    mKeyboard->setEventCallback(this);
-    mMouse->setEventCallback(this);
-
-
-    unsigned int width, height, depth;
-    int left, top;
-
-    window->getMetrics(width, height, depth, left, top);
-
-    this->setWindowExtents(width, height);
-
-     */
+    MessageManager::GetRef().emit<KeyPressedEvent>(arg.key(), arg.modifiers(), arg.isRepeated());
 }
 
-void InputManager::setWindowExtents(int width, int height)
-{/*
-    const OIS::MouseState &mouseState = mMouse->getMouseState();
-
-    mouseState.width = width;
-    mouseState.height = height;
-  */
+void InputManager::keyReleased(const KeyEvent& arg)
+{
+    MessageManager::GetRef().emit<KeyReleasedEvent>(arg.key(), arg.modifiers(), arg.isRepeated());
 }
 
-//void InputManager::update()
-//{
-    //capture();
-//}
-/*
-bool InputManager::keyPressed(const OIS::KeyEvent &arg)
+void InputManager::mouseMoved(MouseMoveEvent& arg)
 {
-    MessageManager::getPtr()->emit<KeyPressedEvent>(arg);
+    MessageManager::GetRef().emit<MouseMovedEvent>(arg.position(), arg.relativePosition(), arg.buttons(), arg.modifiers());
 }
 
-bool InputManager::keyReleased(const OIS::KeyEvent &arg)
+void InputManager::mousePressed(MouseEvent& arg)
 {
-    MessageManager::getPtr()->emit<KeyReleasedEvent>(arg);
+    MessageManager::GetRef().emit<MousePressedEvent>(arg.position(), arg.clickCount(), arg.button(), arg.modifiers());
 }
 
-bool InputManager::mouseMoved(const OIS::MouseEvent &arg)
+void InputManager::mouseReleased(MouseEvent& arg)
 {
-    MessageManager::getPtr()->emit<MouseMovedEvent>(arg);
+    MessageManager::GetRef().emit<MouseReleasedEvent>(arg.position(), arg.clickCount(), arg.button(), arg.modifiers());
 }
-
-bool InputManager::mousePressed(const OIS::MouseEvent &arg, OIS::MouseButtonID id)
-{
-    MessageManager::getPtr()->emit<MousePressedEvent>(arg,id);
-}
-
-bool InputManager::mouseReleased(const OIS::MouseEvent &arg, OIS::MouseButtonID id)
-{
-    MessageManager::getPtr()->emit<MouseReleasedEvent>(arg, id);
-}
-*/
-
-/*
-OIS::Mouse* InputManager::getMouse()
-{
-    return mMouse;
-}
-
-OIS::Keyboard* InputManager::getKeyboard()
-{
-    return mKeyboard;
-}
-
-void InputManager::capture()
-{
-    if(mMouse)
-        mMouse->capture();
-
-    if(mKeyboard)
-        mKeyboard->capture();
-
-}*/
