@@ -1,27 +1,24 @@
 #include "ParticleManager.h"
 #include "RenderManager.h"
+#include "EntityManager.h"
 //#include "Ogre.h"
-
-ParticleManager::ParticleManager()
-{
-}
 
 
 void ParticleManager::init()
 {
     auto& messenger = MessageManager::GetRef();
-    messenger.subscribe<ShootEvent>(this);
-    messenger.subscribe<ObjectDestroyed>(this);
-    
-    /*
-    MessageManager::getPtr()->subscribe<ShootEvent>(*this);
-    MessageManager::getPtr()->subscribe<ObjectDestroyed>(*this);
+    auto& d = messenger.GetDispatcher();
+    d.sink<ShootEvent>().connect<&ParticleManager::ReceiveShootEvent>(this);
+    d.sink<ObjectDestroyed>().connect<&ParticleManager::ReceiveObjectDestroyed>(this);
+    //messenger.subscribe<ShootEvent>(this);
+    //messenger.subscribe<ObjectDestroyed>(this);
     timeSinceLastDelete = 0;
+    /*
     particleSystems["explosion"] = new Particle("explosion","Supernova");
-  */
+    */
 }
 
-void ParticleManager::receive(const ShootEvent &evt)
+void ParticleManager::ReceiveShootEvent(const ShootEvent &evt)
 {/*
     if(evt.entity.valid())
     {
@@ -32,20 +29,20 @@ void ParticleManager::receive(const ShootEvent &evt)
   */
 }
 
-void ParticleManager::receive(const ObjectDestroyed &evt)
-{/*
-    if(evt.object.valid())
+void ParticleManager::ReceiveObjectDestroyed(const ObjectDestroyed& evt)
+{
+    const auto& registry = EntityManager::Registry();
+    
+    if (registry.valid(evt.object))
     {
-        entityx::Entity obj = evt.object;
-        createEmitter("explosion", obj);
+        createEmitter("explosion", evt.object);
     }
-  */
 }
 
 void ParticleManager::Update(float dt)
 {
-    /*
     timeSinceLastDelete += dt;
+    /*
     if (timeSinceLastDelete >= deleteInterval && !emitters.empty())
     {
         Ogre::ParticleEmitter *pe = emitters.front();
@@ -58,7 +55,7 @@ void ParticleManager::Update(float dt)
     */
 }
 
-void ParticleManager::createEmitter(std::string name, entt::DefaultRegistry::entity_type ent)
+void ParticleManager::createEmitter(std::string name, Entity ent)
 {/*
     if(ent.valid())
     {

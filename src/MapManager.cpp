@@ -32,6 +32,8 @@ void MapManager::Init()
         }
         toAdd = rand() % 2 + 8;
     }
+    
+    LOGD(GREENBOLD << "MapManager" << RESET << "configured")
 }
 
 void MapManager::InitMaze(int maze[MAX][MAX])
@@ -70,7 +72,7 @@ void MapManager::MazeGenerator(std::vector<std::vector<bool>> maze, int size, in
     }
 
     drillers.emplace_back(maze_size_x / 2, maze_size_y / 2);
-    while (!drillers.empty())
+    while (not drillers.empty())
     {
         list<pair<int, int>>::iterator m, _m;
         m = drillers.begin();
@@ -78,7 +80,7 @@ void MapManager::MazeGenerator(std::vector<std::vector<bool>> maze, int size, in
         while (m != _m)
         {
             bool remove_driller = false;
-            switch(rand() % 4)
+            switch (rand() % 4)
             {
                 case 0:
                     (*m).second -= 2;
@@ -148,25 +150,26 @@ void MapManager::MazeGenerator(std::vector<std::vector<bool>> maze, int size, in
 
 int MapManager::IsClosed(int maze[MAX][MAX], int x, int y)
 {
-    return (maze[x - 1][y] == WALL
-            && maze[x][y - 1] == WALL
-            && maze[x][y + 1] == WALL
-            && maze[x + 1][y] == WALL)
+    return (maze[x - 1][y] == WALL && 
+            maze[x][y - 1] == WALL && 
+            maze[x][y + 1] == WALL && 
+            maze[x + 1][y] == WALL)
         ? WALL
         : PATH;
 }
 
-void MapManager::PrintMaze(entt::DefaultRegistry& registry)
+void MapManager::PrintMaze(Registry& registry)
 {
-    constexpr int pMetalTreshold = 15; // soglia scelta metallo invece di mattoni
+    // metal threshold choice instead of bricks
+    constexpr int pMetalTreshold = 15; 
     int p = 0;
     std::string material;
     
     for (int i = 0; i < 62; ++i)
     {
-        _finalMaze[0][i] = WALL;
+        _finalMaze[0][i]  = WALL;
         _finalMaze[61][i] = WALL;
-        _finalMaze[i][0] = WALL;
+        _finalMaze[i][0]  = WALL;
         _finalMaze[i][61] = WALL;
     }
     
@@ -188,12 +191,12 @@ void MapManager::PrintMaze(entt::DefaultRegistry& registry)
     }
 }
 
-int MapManager::Collide(Position pos, Magnum::Vector3 delta, Orientation ori) const
+int MapManager::Collide(const Position& pos, const Magnum::Vector3& delta, const Orientation& ori) const
 {
     using namespace Magnum;
     
-    delta *= 4;
-    Vector3 newPos = pos.position + delta - Vector3::zAxis(ori.orientation.axis().z());
+    auto dt = delta * 4;
+    Vector3 newPos = pos.position + dt - Vector3::zAxis(ori.orientation.axis().z());
     
     if ((newPos.x() + 125) / 4 < 0 || (newPos.x() + 125) / 4 > MAX)
         return PATH;
@@ -202,58 +205,65 @@ int MapManager::Collide(Position pos, Magnum::Vector3 delta, Orientation ori) co
     if (_finalMaze[int((newPos.z() + 125) / 4)][int(newPos.x() + 125) / 4] == WALL)
         return WALL;
     
-    newPos = pos.position + delta - 2 * Vector3::xAxis(ori.orientation.axis().x());
+    newPos = pos.position + dt - 2 * Vector3::xAxis(ori.orientation.axis().x());
     if (_finalMaze[int((newPos.z() + 125) / 4)][int(newPos.x() + 125) / 4] == WALL)
         return WALL;
-    newPos = pos.position + delta + 2 * Vector3::xAxis(ori.orientation.axis().x());
+    newPos = pos.position + dt + 2 * Vector3::xAxis(ori.orientation.axis().x());
     if (_finalMaze[int((newPos.z() + 125) / 4)][int(newPos.x() + 125) / 4] == WALL)
         return WALL;
 
     return PATH;
 }
 
-/*bool MapManager::fireCollision(entityx::ptr<Position> start, entityx::ptr<Orientation> direction, Ogre::String name){
-  /*  Ogre::Ray ray(start->position,-direction->orientation.zAxis());
+bool MapManager::FireCollision(const Position& start, const Orientation& direction, std::string name)
+{
+    /*
+    Ogre::Ray ray(start->position,-direction->orientation.zAxis());
     mRaySceneQuery->setRay(ray);
-    Ogre::RaySceneQueryResult &result = mRaySceneQuery->execute();
+    Ogre::RaySceneQueryResult& results = mRaySceneQuery->execute();
     Ogre::RaySceneQueryResult::iterator itr;
     //itr = result.begin();
     //itr++;
-    Ogre::Real min = 100000;
-    Ogre::String minName="";
-    for (itr = result.begin(); itr != result.end(); itr++){
-        if(min>itr->distance && itr->distance>0){
-            min=itr->distance;
-            minName=itr->movable->getParentSceneNode()->getName();
+    */
+    long min = 100'000;
+    std::string minName = "";
+    /*
+    for (itr = results.begin(); itr != results.end(); ++itr)
+    {
+        if (min > itr->distance && itr->distance > 0)
+        {
+            min = itr->distance;
+            minName = itr->movable->getParentSceneNode()->getName();
         }
-      //  std::cout<<itr->movable->getParentSceneNode()->getName()<<" "<<itr->distance<<" ";
+      //  std::cout << itr->movable->getParentSceneNode()->getName() << " " << itr->distance << " ";
     }
-    std::cout<<minName<<std::endl;
-    //if(name.compare(minName)==0)
-      //      return true;
-    std::cout<<std::endl;
+    */
+    std::cout << minName << std::endl;
+    if (name == minName) {
+        return true;
+    }
+    std::cout << std::endl;
     return false;
 }
-*/
 
-bool MapManager::IsFree(Magnum::Vector3 pos)
+bool MapManager::IsFree(float x, float z)
 {
-    return _finalMaze[int((pos.z() + 125) / 4)][int(pos.x() + 125) / 4] != WALL;
+    return _finalMaze[int((z + 125) / 4)][int(x + 125) / 4] != WALL;
 }
 
 void MapManager::DeletePosition(Magnum::Vector3 pos)
 {
-    _finalMaze[int((pos.z() + 125) / 4)][int(pos.x() + 125) / 4] = PATH;
+    _finalMaze[int(pos.z() + 125) / 4][int(pos.x() + 125) / 4] = PATH;
 }
 
 Magnum::Vector3 MapManager::FindFreePos()
 {
-    int x,z;
+    int x, z;
     do {
         x = (rand() % 220) - 110;
         z = (rand() % 220) - 110;
         LOGD(x << "-" << z);
-    } while (!IsFree(Magnum::Vector3(x, 0, z)));
+    } while (not IsFree(x, z));
 
-    return Magnum::Vector3(x, 1, z);
+    return Magnum::Vector3{ static_cast<float>(x), 1, static_cast<float>(z) };
 }

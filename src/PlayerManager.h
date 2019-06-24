@@ -4,15 +4,15 @@
 #include "Singleton.h"
 #include "Messages.h"
 
-//! @todo put thhis into a seperate header
-typedef entt::DefaultRegistry::entity_type Entity;
 
 class PlayerManager : public Singleton<PlayerManager>
 {
 public:
     void init();
-    void setPlayerEntity(Entity player);
-    Entity getPlayerEntity() const;
+    void SetPlayerEntity(Entity player);
+    Entity GetPlayerEntity() const;
+    
+    inline static Entity GetPlayer() noexcept { return GetRef().GetPlayerEntity(); };
     
     void handleKeyPressed(const KeyPressedEvent& event);
     void handleKeyReleased(const KeyReleasedEvent& event);
@@ -21,6 +21,7 @@ public:
     void handleMouseReleased(const MouseReleasedEvent& event);
     
 private:
-    Entity player;
+    entt::monostate<"Player"_hs> player{}; // ensures thread safety
+    //Entity player;
     void fire();
 };

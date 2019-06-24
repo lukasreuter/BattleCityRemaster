@@ -2,42 +2,59 @@
 
 #include "Screen.h"
 #include "Singleton.h"
+#include "MessageManager.h"
 #include <entt.hpp>
 #include <vector>
 
 
 class ScreenManager : public Singleton<ScreenManager>
 {
+    // holds all the screens in a stack-like fashion
+    std::vector<std::unique_ptr<Screen>> _screens;
+    
 public:
     ScreenManager() = default;
     ~ScreenManager();
 
-    void Init(Screen *initialScreen);
+    template<typename T>
+    void Init()
+    {
+        auto& dispatcher = MessageManager::GetRef().GetDispatcher();
+        dispatcher.sink<KeyPressedEvent>().connect<&ScreenManager::ReceiveKeyPressedEvent>(this);
+        dispatcher.sink<KeyReleasedEvent>().connect<&ScreenManager::ReceiveKeyReleasedEvent>(this);
+        dispatcher.sink<MouseMovedEvent>().connect<&ScreenManager::ReceiveMouseMovedEvent>(this);
+        dispatcher.sink<MousePressedEvent>().connect<&ScreenManager::ReceiveMousePressedEvent>(this);
+        dispatcher.sink<MouseReleasedEvent>().connect<&ScreenManager::ReceiveMouseReleasedEvent>(this);
+        //!@todo
+        //Ogre::FontManager::getSingleton().getByName("SdkTrays/Caption")->load();
+        PushScreen<T>();
+    };
 
 
-    template <typename T>
+    template<typename T>
     void PushScreen()
     {
-        if (!_screens.empty())
+        if (not _screens.empty()) {
             _screens.back()->Pause();
+        }
 
-        _screens.push_back(std::make_unique<T>());
-        _screens.back()->Enter();
+        _screens.emplace_back(std::make_unique<T>())->Enter();
+        //_screens.back()->Enter();
     }
 
     void PopScreen();
 
-    template <typename T>
+    template<typename T>
     void ChangeScreen()
     {
         PopScreen();
         PushScreen<T>();
     }
 
-    template <typename T>
+    template<typename T>
     void ResetTo()
     {
-        while (!_screens.empty()) {
+        while (not _screens.empty()) {
             _screens.back()->Leave();
             _screens.pop_back();
         }
@@ -49,12 +66,9 @@ public:
 
     //bool frameRenderingQueued(const Ogre::FrameEvent &evt);
 
-    void receive(const struct KeyPressedEvent& event);
-    void receive(const struct KeyReleasedEvent& event);
-    void receive(const struct MouseMovedEvent& event);
-    void receive(const struct MousePressedEvent& event);
-    void receive(const struct MouseReleasedEvent& event);
-
-private:
-    std::vector<std::unique_ptr<Screen>> _screens;
+    void ReceiveKeyPressedEvent(const KeyPressedEvent& event);
+    void ReceiveKeyReleasedEvent(const KeyReleasedEvent& event);
+    void ReceiveMouseMovedEvent(const MouseMovedEvent& event);
+    void ReceiveMousePressedEvent(const MousePressedEvent& event);
+    void ReceiveMouseReleasedEvent(const MouseReleasedEvent& event);
 };

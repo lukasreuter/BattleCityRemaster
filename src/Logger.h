@@ -28,5 +28,12 @@
     #define LOGD(args)
     #define GREENBOLD
     #define GREEN
+    #define REDBOLD
+    #define RED
+    #define BLUEBOLD
+    #define BLUE
+    #define YELLOWBOLD
+    #define YELLOW
+    #define BOLD
     #define RESET
 #endif

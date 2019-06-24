@@ -1,10 +1,15 @@
 #pragma once
 
 #include "RenderManager.h"
+#include "Registry.hpp"
 #include <Magnum/Magnum.h>
 #include <Magnum/Math/Math.h>
 #include <Magnum/Math/Quaternion.h>
 #include <Magnum/SceneGraph/Object.h>
+#include <Magnum/SceneGraph/Scene.h>
+#include <Magnum/SceneGraph/MatrixTransformation3D.h>
+#include <Magnum/SceneGraph/Camera.h>
+#include <Magnum/SceneGraph/Drawable.h>
 #include <entt.hpp>
 #include <map>
 
@@ -33,7 +38,14 @@ struct Position
 
 struct Velocity
 {
-    Magnum::Vector3 velocity, direction;
+    // the direction is the vector of the velocity itself
+    Magnum::Vector3 velocity;//, direction;
+};
+
+struct AngularVelocity
+{
+    // the direction is the vector of the velocity itself
+    Magnum::Vector3 angularVelocity;//, direction;
 };
 
 struct Renderable
@@ -54,11 +66,6 @@ struct Orientation
     Magnum::Quaternion orientation;
 };
 
-struct AngularVelocity
-{
-    Magnum::Vector3 angularVelocity, direction;
-};
-
 // this is a single instance component that uniquely identifies the player
 struct Player {};
 
@@ -76,7 +83,7 @@ struct Score
 
 struct Children
 {
-    std::map<std::string, entt::DefaultRegistry::entity_type> children;
+    std::map<std::string, Entity> children;
 };
 
 struct LightComponent

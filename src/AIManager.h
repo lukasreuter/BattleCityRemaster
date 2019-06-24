@@ -2,6 +2,7 @@
 
 #include "Singleton.h"
 #include "Components.h"
+#include "Registry.hpp"
 #include <Magnum/Magnum.h>
 #include <Magnum/Math/Vector3.h>
 #include <entt.hpp>
@@ -9,11 +10,9 @@
 
 class AIManager : public Singleton<AIManager>
 {
-    using Entity = entt::DefaultRegistry::entity_type;
-    
 public:
-    void Init(entt::DefaultRegistry& registry);
-    void Update(float dt, entt::DefaultRegistry& registry);
+    void Init(Registry& registry);
+    void Update(float dt, Registry& registry);
 /*
 private:
     entt::::Entity tankPlayer;
@@ -21,7 +20,7 @@ private:
 
  */
     
-    void Seek(Velocity& vel, AngularVelocity& angVel, Orientation& ori, Magnum::Vector3 diff, Magnum::Rad theta, float dt);
-    void Walk(Velocity& vel, Orientation& ori, AngularVelocity& angVel, Position& pos, double dt);
+    void Seek(Velocity& vel, AngularVelocity& angVel, const Orientation& ori, const Magnum::Vector3& diff, Magnum::Rad theta, float dt);
+    void Walk(Velocity& vel, AngularVelocity& angVel, const Orientation& ori, const Position& pos, double dt);
     void Fire(Entity start, Entity end);
 };

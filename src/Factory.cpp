@@ -1,85 +1,93 @@
 #include "Factory.h"
 #include "Components.h"
 #include "DotSceneLoader.h"
+#include "SceneManager.h"
 #include <Magnum/Magnum.h>
+#include <Magnum/Math/Quaternion.h>
+#include <Magnum/SceneGraph/SceneGraph.h>
+#include <Magnum/SceneGraph/Scene.h>
+#include <Magnum/SceneGraph/MatrixTransformation3D.h>
+#include <Magnum/SceneGraph/Camera.h>
+#include <Magnum/SceneGraph/Drawable.h>
 #include <string>
-#include <string_view>
-
-using namespace std::literals::string_view_literals;
 
 
-Entity Factory::createTank(entt::DefaultRegistry& entityMgr, std::string prefix, float linearVelocity, float angularVelocity, Magnum::Vector3 overHating, int health, bool ai)
-{/*
+using Object3D = Magnum::SceneGraph::Object<Magnum::SceneGraph::MatrixTransformation3D>;
+using Scene3D = Magnum::SceneGraph::Scene<Magnum::SceneGraph::MatrixTransformation3D>;
+
+
+Entity Factory::createTank(Registry& registry, std::string prefix, float linearVelocity, float angularVelocity, const Magnum::Vector3& overHeating, int health, bool ai)
+{
+    using namespace Magnum;
+    
     DotSceneLoader loader;
-    Ogre::SceneManager* sceneMgr = RenderManager::getPtr()->getSceneManager();
+    auto& sceneMgr = SceneManager::GetRef();
 
     loader.parseDotScene("tank.scene", "General", sceneMgr, 0, prefix);
-
-    auto b = "TankControl"sv;
     
-    Ogre::SceneNode* ctl = sceneMgr->getSceneNode(prefix + b);
-    Ogre::SceneNode* body = sceneMgr->getSceneNode(prefix + "TankBody");
-    Ogre::SceneNode* turret = sceneMgr->getSceneNode(prefix + "TankTurret");
-    Ogre::SceneNode* cannon = sceneMgr->getSceneNode(prefix +"TankCannon");
+    auto* ctl    = sceneMgr.getSceneNode(prefix + "TankControl");
+    auto* body   = sceneMgr.getSceneNode(prefix + "TankBody");
+    auto* turret = sceneMgr.getSceneNode(prefix + "TankTurret");
+    auto* cannon = sceneMgr.getSceneNode(prefix + "TankCannon");
+    
+    Entity tankEmptyControl = registry.create();
+    Entity tankTurret = registry.create();
+    Entity tankBody = registry.create();
+    Entity tankCannon = registry.create();
 
-    Entity tankEmptyControl = entityMgr.create();
-    Entity tankTurret = entityMgr.create();
-    Entity tankBody = entityMgr.create();
-    Entity tankCannon = entityMgr.create();
-
-    tankEmptyControl.assign<Position>(ctl->getPosition());
-    tankEmptyControl.assign<Orientation>(ctl->getOrientation());
-    tankEmptyControl.assign<Velocity>(0, 0, linearVelocity);
-    tankEmptyControl.assign<AngularVelocity>(0, angularVelocity, 0);
-    tankEmptyControl.assign<Renderable>(ctl);
-    tankEmptyControl.assign<OverHeating>(overHating.x,overHating.y,overHating.z);
-    tankEmptyControl.assign<Destroyable>(health,health);
-    tankEmptyControl.assign<Collidable>();
-    tankEmptyControl.assign<Name>(prefix);
-    if(ai){
-        tankEmptyControl.assign<AI>();
-        Ogre::Entity *model = static_cast<Ogre::Entity*>(body->getAttachedObject(0));
+    registry.assign<Position>(tankEmptyControl, ctl->transformation().translation());
+    registry.assign<Orientation>(tankEmptyControl, Quaternion::fromMatrix(ctl->transformation().rotation()));
+    registry.assign<Velocity>(tankEmptyControl, Vector3{ 0, 0, linearVelocity });
+    registry.assign<AngularVelocity>(tankEmptyControl, Vector3{ 0, angularVelocity, 0 });
+    registry.assign<Renderable>(tankEmptyControl, ctl);
+    registry.assign<OverHeating>(tankEmptyControl, overHeating.x(), overHeating.y(), overHeating.z());
+    registry.assign<Destroyable>(tankEmptyControl, health, health);
+    registry.assign<Collidable>(tankEmptyControl);
+    registry.assign<Name>(tankEmptyControl, prefix);
+    
+    if (ai)
+    {
+        registry.assign<AI>(tankEmptyControl);
+        /*
+        Ogre::Entity *model = static_cast<Ogre::Entity*>(body->children().first());
         model->getSubEntity(1)->setMaterialName("Red");
 
         model = static_cast<Ogre::Entity*>(turret->getAttachedObject(0));
         model->getSubEntity(1)->setMaterialName("Red");
 
         model = static_cast<Ogre::Entity*>(cannon->getAttachedObject(0));
-        model->getSubEntity(1)->setMaterialName("Red");
-
+        model->getSubEntity(1)->setMaterialName("Red");*/
     }
 
-    ptr<Children> child = tankEmptyControl.assign<Children>();
-    child->children["body"] = tankBody;
-    child->children["turret"] = tankTurret;
-    //child->children.push_back(tankBody);
-    //child->children.push_back(tankTurret);
+    auto& child = registry.assign<Children>(tankEmptyControl);
+    child.children["body"]   = tankBody;
+    child.children["turret"] = tankTurret;
 
-    tankTurret.assign<Position>(turret->getPosition());
-    tankTurret.assign<Orientation>(turret->getOrientation());
-    tankTurret.assign<Renderable>(turret);
-    child = tankTurret.assign<Children>();
-    child->children["cannon"] = tankCannon;
+    registry.assign<Position>(tankTurret, turret->transformation().translation());
+    registry.assign<Orientation>(tankTurret, Quaternion::fromMatrix(turret->transformation().rotation()));
+    registry.assign<Renderable>(tankTurret, turret);
+    child = registry.assign<Children>(tankTurret);
+    child.children["cannon"] = tankCannon;
 
-    tankBody.assign<Position>(body->getPosition());
-    tankBody.assign<Orientation>(body->getOrientation());
-    tankBody.assign<Renderable>(body);
+    registry.assign<Position>(tankBody, body->transformation().translation());
+    registry.assign<Orientation>(tankBody, Quaternion::fromMatrix(body->transformation().rotation()));
+    registry.assign<Renderable>(tankBody, body);
 
-    tankCannon.assign<Position>(cannon->getPosition());
-    tankCannon.assign<Renderable>(cannon);
-    tankCannon.assign<Orientation>(cannon->getOrientation());
+    registry.assign<Position>(tankCannon, cannon->transformation().translation());
+    registry.assign<Orientation>(tankCannon, Quaternion::fromMatrix(cannon->transformation().rotation()));
+    registry.assign<Renderable>(tankCannon, cannon);
 
-
-    ctl->scale(.35, .55, .35);
+    ctl->scale(Vector3{ .35f, .55f, .35f });
+    
     return tankEmptyControl;
-  */
-    return entityMgr.create();
 }
 
-Entity Factory::createBlock(entt::DefaultRegistry& entityMgr, int x, int y, int z, std::string material)
-{/*
-    Entity block = entityMgr->create();
-    Ogre::SceneManager* sceneMgr = RenderManager::getPtr()->getSceneManager();
+
+Entity Factory::createBlock(Registry& registry, int x, int y, int z, std::string material)
+{
+    Entity block = registry.create();
+    auto& sceneMgr = SceneManager::GetRef();
+    /*
     Ogre::Entity* wall = sceneMgr->createEntity("Cube.mesh");
     wall->setMaterialName(material);
     Ogre::SceneNode* wallNode = sceneMgr->getRootSceneNode()->createChildSceneNode();
@@ -90,17 +98,17 @@ Entity Factory::createBlock(entt::DefaultRegistry& entityMgr, int x, int y, int 
     wallNode->setPosition(x,y,z);
     block.assign<Orientation>(wallNode->getOrientation());
     block.assign<Renderable>(wallNode);
-    block.assign<Name>("Block");
-    if(material == "Wall"){
-        block.assign<Destroyable>(200);
+     */
+    registry.assign<Name>(block, "Block");
+    if (material == "Wall") {
+        registry.assign<Destroyable>(block, 200, 200);
     }
 
     return block;
-  */
-    return entityMgr.create();
 }
 
-Entity Factory::createProjectile(entt::DefaultRegistry& where, Magnum::Vector3 pos, Magnum::Quaternion ori, float velocity, std::string materialName)
+
+Entity Factory::createProjectile(Registry& where, Magnum::Vector3 pos, Magnum::Quaternion ori, float velocity, std::string materialName)
 {/*
     Ogre::Entity *projMesh;
     Ogre::SceneManager *sceneMgr = RenderManager::getPtr()->getSceneManager();
@@ -143,7 +151,8 @@ Entity Factory::createProjectile(entt::DefaultRegistry& where, Magnum::Vector3 p
     return where.create();
 }
 
-void Factory::createFloor(entt::DefaultRegistry& entityMgr, int sizex, int sizey, int repetition_x, int repetition_y, std::string material)
+
+void Factory::createFloor(Registry& entityMgr, int sizex, int sizey, int repetition_x, int repetition_y, std::string material)
 {/*
     Ogre::Plane plane(Ogre::Vector3::UNIT_Y, 0);
     Ogre::MeshManager::getSingletonPtr()->createPlane("floorPlane",Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,

@@ -8,17 +8,18 @@
 #pragma once
 
 #include "Singleton.h"
+#include "Registry.hpp"
 #include <entt.hpp>
 
 class EntityManager : public Singleton<EntityManager>
 {
-    entt::DefaultRegistry _registry;
+    Registry _registry;
     
 public:
     EntityManager() : _registry{} {}
     
-    inline entt::DefaultRegistry& GetRegistry() { return _registry; };
+    inline Registry& GetRegistry() { return _registry; };
     
     // short hand for GetRef().GetRegistry()
-    static entt::DefaultRegistry& Registry() { return GetRef().GetRegistry(); };
+    static Registry& Registry() { return GetRef().GetRegistry(); };
 };

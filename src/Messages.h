@@ -5,7 +5,6 @@
 #include <entt.hpp>
 #include <string>
 
-typedef entt::DefaultRegistry::entity_type Entity;
 typedef Magnum::Platform::Sdl2Application::KeyEvent KeyEvent;
 typedef Magnum::Platform::Sdl2Application::MouseEvent MouseEvent;
 typedef Magnum::Platform::Sdl2Application::MouseMoveEvent MouseMoveEvent;

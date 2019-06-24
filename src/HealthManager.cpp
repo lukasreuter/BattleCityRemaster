@@ -26,7 +26,7 @@ HealthManager::~HealthManager()
 
 void HealthManager::receive(const HitEvent& event)
 {
-    LOGD("ricevuto");
+    LOGD("received Health event");
     auto& registry = EntityManager::Registry();
     
     //!@todo: replace the lambda with a loop or else the early return dont work as expected
@@ -78,7 +78,7 @@ void HealthManager::receive(const HitEvent& event)
                 }
                 return;
             } else {
-                LOGD("punti" << destroyable.health)
+                LOGD("points " << destroyable.health)
 //                entity.assign<Destroyable>(points->health, max);
             }
             return;

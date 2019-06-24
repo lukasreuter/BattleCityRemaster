@@ -18,9 +18,9 @@ public:
 
     virtual void keyPressed(const KeyPressedEvent& evt) = 0;
     virtual void keyReleased(const KeyReleasedEvent& evt) = 0;
-    virtual void mouseMoved(const MouseMovedEvent& evt);
-    virtual void mousePressed(const MousePressedEvent& evt);
-    virtual void mouseReleased(const MouseReleasedEvent& evt);
+    virtual void mouseMoved(const MouseMovedEvent&) {};
+    virtual void mousePressed(const MousePressedEvent&) {};
+    virtual void mouseReleased(const MouseReleasedEvent&) {};
 
 
      /*
@@ -35,7 +35,6 @@ protected:
 };
 
 
-
 class MenuScreen : public Screen
 {
 public:
@@ -47,13 +46,14 @@ public:
     void Leave() final;
     void Update(float dt) final;
     //void buttonHit(OgreBites::Button *button);
-    //void yesNoDialogClosed(const Ogre::DisplayString &question, bool yesHit);
-    void keyPressed(const KeyPressedEvent& evt) final;
-    void keyReleased(const KeyReleasedEvent& evt) final;
+    void YesNoDialogClosed(const std::string& question, bool yesHit);
+    void keyPressed(const KeyPressedEvent&) final {};
+    void keyReleased(const KeyReleasedEvent&) final {};
 
 private:
     bool change = false;
 };
+
 
 class PlayScreen : public Screen
 {
@@ -77,6 +77,7 @@ private:
     //OgreBites::ProgressBar *mHeatBar;
 };
 
+
 class PauseScreen : public Screen
 {
 public:
@@ -86,14 +87,15 @@ public:
     void Pause() final;
     void Resume() final;
     void Leave() final;
-    void Update(float dt) final;
+    void Update(float) final {};
     
-    void keyPressed(const KeyPressedEvent& evt) final;
+    void keyPressed(const KeyPressedEvent&) final {};
     void keyReleased(const KeyReleasedEvent& evt) final;
     
     //void buttonHit(OgreBites::Button *button);
     void YesNoDialogClosed(const std::string& question, bool yesHit);
 };
+
 
 class GameOverScreen : public Screen
 {
@@ -106,10 +108,10 @@ public:
     void Leave() final;
     void Update(float dt) final;
 
-    void keyReleased(const KeyReleasedEvent& evt) final;
-    void keyPressed(const KeyPressedEvent& evt) final;
+    void keyPressed(const KeyPressedEvent&) final {};
+    void keyReleased(const KeyReleasedEvent&) final {};
 
 private:
     static constexpr double screenDuration = 5;
-    double mTime = 0;
+    double _time = 0;
 };

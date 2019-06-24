@@ -1,6 +1,7 @@
 #include "ScoreManager.h"
 #include "Logger.h"
 #include "EntityManager.h"
+#include "PlayerManager.h"
 #include "ScreenManager.h"
 
 
@@ -22,12 +23,12 @@ void ScoreManager::receive(const ObjectDestroyed& event)
 {
     auto& reg = EntityManager::Registry();
     
-    Entity obj = event.object;
-    Entity player = reg.attachee<Player>();
+    auto obj = event.object;
+    auto player = PlayerManager::GetPlayer();
 
     if (obj == player) {
         ScreenManager::GetRef().ResetTo<GameOverScreen>();
-    } else if (auto name = reg.has<Name>() ? reg.get<Name>().name : ""; name != "Block") {
+    } else if (auto name = reg.has<Name>(obj) ? reg.get<Name>(obj).name : ""; name != "Block") {
         score += unitScore;
     }
 }

@@ -13,6 +13,7 @@ typedef float milliseconds;
 class ManagerInterface
 {
 public:
+    virtual ~ManagerInterface();
     virtual void Init() = 0;
     virtual void Update(milliseconds dt, entt::DefaultRegistry& registry) = 0;
 };

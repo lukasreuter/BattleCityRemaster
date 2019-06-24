@@ -1,12 +1,12 @@
 #pragma once
 
-#include <entity/registry.hpp>
 #include "Singleton.h"
+#include "Registry.hpp"
 
 
 class MovementManager : public Singleton<MovementManager>
 {
 public:
-    void Init(entt::DefaultRegistry& registry);
-    void Update(float dt, entt::DefaultRegistry& registry);
+    void Init(Registry& registry);
+    void Update(float dt, Registry& registry);
 };

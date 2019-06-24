@@ -7,23 +7,13 @@
 #include "PlayerManager.h"
 #include "Factory.h"
 #include "ScreenManager.h"
+#include "EntityManager.h"
 #include "Components.h"
 #include "ScoreManager.h"
 #include "Logger.h"
 #include <iostream>
 
 /****** SCREEN BASE CLASS ******/
-void Screen::mouseMoved(const MouseMovedEvent& evt)
-{
-}
-
-void Screen::mousePressed(const MousePressedEvent& evt)
-{
-}
-
-void Screen::mouseReleased(const MouseReleasedEvent& evt)
-{
-}
 
 
 /****** MENU SCREEN******/
@@ -77,26 +67,19 @@ void MenuScreen::buttonHit(Button *button)
 
 }*/
 
-void MenuScreen::Update(float dt)
+void MenuScreen::Update(float)
 {
-  //  if(change)
-    //    ScreenManager::getPtr()->changeScreen(PlayScreen::getPtr());
-}
-/*
-void MenuScreen::yesNoDialogClosed(const Ogre::DisplayString &question, bool yesHit)
-{
-    //if( question == "Do you want to quit?" && yesHit)
-      //  MessageManager::getPtr()->emit<ShutDownEvent>();
-}*/
-
-void MenuScreen::keyPressed(const KeyPressedEvent& evt)
-{
+    if (change) {
+        ScreenManager::GetRef().ChangeScreen<PlayScreen>();
+    }
 }
 
-void MenuScreen::keyReleased(const KeyReleasedEvent& evt)
+void MenuScreen::YesNoDialogClosed(const std::string& question, bool yesHit)
 {
+    if (yesHit && question == "Do you want to quit?") {
+        MessageManager::GetRef().emit<ShutDownEvent>();
+    }
 }
-
 
 /****** PlayScreen ******/
 void PlayScreen::Enter()
@@ -199,22 +182,24 @@ void PlayScreen::Leave()
   */
 }
 
-void PlayScreen::Update(float dt)
-{/*
-    Entity player = PlayerManager::getPtr()->getPlayerEntity();
-    if(player.valid()){
-        ptr<Destroyable> dest = player.component<Destroyable>();
-        ptr<OverHeating> heat = player.component<OverHeating>();
-        double healthPercent = (double)dest->health / dest->maxHealth;
-        double heatPercent = 1 - (heat->overheating / heat->maxheating);
-        mHealthBar->setComment(Ogre::StringConverter::toString(dest->health));
-        mHeatBar->setComment(Ogre::StringConverter::toString((int)(heatPercent * 100)));
+void PlayScreen::Update(float)
+{
+    Entity player = PlayerManager::GetPlayer();
+    auto& registry = EntityManager::Registry();
+    
+    if (registry.valid(player))
+    {
+        auto& dest = registry.get<Destroyable>(player);
+        auto& heat = registry.get<OverHeating>(player);
+        double healthPercent = static_cast<double>(dest.health) / dest.maxHealth;
+        double heatPercent = 1 - (static_cast<double>(heat.overheating) / heat.maxheating);
+       /* mHealthBar->setComment(Ogre::StringConverter::toString(dest->health));
+        mHeatBar->setComment(Ogre::StringConverter::toString((int) (heatPercent * 100)));
         mHealthBar->setProgress(healthPercent);
-        mHeatBar->setProgress(heatPercent);
-    }
+        mHeatBar->setProgress(heatPercent);*/
+    }/*
     mInfoPanel->setParamValue("Score",
-                              Ogre::StringConverter::toString(ScoreManager::getPtr()->getScore()));
-  */
+                              Ogre::StringConverter::toString(ScoreManager::getPtr()->getScore()));*/
 }
 
 void PlayScreen::mouseMoved(const MouseMovedEvent& evt)
@@ -304,11 +289,6 @@ void PauseScreen::YesNoDialogClosed(const std::string& question, bool yesHit)
     }
 }
 
-
-void PauseScreen::keyPressed(const KeyPressedEvent& evt)
-{
-}
-
 void PauseScreen::keyReleased(const KeyReleasedEvent& evt)
 {
     using Key = Magnum::Platform::Sdl2Application::KeyEvent::Key;
@@ -316,10 +296,6 @@ void PauseScreen::keyReleased(const KeyReleasedEvent& evt)
     if (evt.key == Key::Esc) {
         ScreenManager::GetRef().PopScreen();
     }
-}
-
-void PauseScreen::Update(float dt)
-{
 }
 
 /**** GameOverScreen *****/
@@ -360,23 +336,15 @@ void GameOverScreen::Leave()
 */
 }
 
-void GameOverScreen::Update(float timeSinceLastFrame)
+void GameOverScreen::Update(float dt)
 {
-    mTime -= timeSinceLastFrame;
+    _time -= dt;
 
-    LOGD("Tempo rimasto: " << mTime);
+    LOGD("Tempo rimasto: " << _time);
 
-    if (mTime <= 0) {
-        mTime = screenDuration;
+    if (_time <= 0) {
+        _time = screenDuration;
         ScoreManager::GetRef().ResetScore();
         ScreenManager::GetRef().ChangeScreen<MenuScreen>();
     }
-}
-
-void GameOverScreen::keyPressed(const KeyPressedEvent& evt) {
-
-}
-
-void GameOverScreen::keyReleased(const KeyReleasedEvent& evt) {
-
 }

@@ -14,12 +14,12 @@ void PlayerManager::init()
 //    this->player =
 }
 
-void PlayerManager::setPlayerEntity(Entity player)
+void PlayerManager::SetPlayerEntity(Entity player)
 {
     this->player = player;
 }
 
-Entity PlayerManager::getPlayerEntity() const
+Entity PlayerManager::GetPlayerEntity() const
 {
     return player;
 }
@@ -79,21 +79,19 @@ void PlayerManager::handleMouseMoved(const MouseMovedEvent& event)
 {
     /*
     if(player.valid()){
-        //Componenti di orientamento del corpo e della torretta
+        // Body and turret orientation components
         ptr<Orientation> bodyOri, ori;
 
-        //Conterrà la rotazione da bodyOri a ori
         Ogre::Quaternion rotation;
         Ogre::Quaternion newOri;
-        // utilizzate per Quaternion::toAngleAxis
         Ogre::Vector3 axis;
         Ogre::Radian angle;
 
-        // creo i quaternioni per la rotazione della torretta e del cannone
+        // quaternions for the turrent and the cannon
         Ogre::Quaternion qy(Ogre::Degree(-event.state.X.rel * .05), Ogre::Vector3::UNIT_Y);
         //Ogre::Quaternion qx(Ogre::Degree(-event.state.Y.rel * .05), Ogre::Vector3::UNIT_X);
 
-        //Recupero le entità e le componenti necessarie
+        // recovery of the necessary entities and components
         Entity turret= player.component<Children>()->children["turret"];
         //Entity cannon = turret.component<Children>()->children["cannon"];
 
@@ -102,20 +100,20 @@ void PlayerManager::handleMouseMoved(const MouseMovedEvent& event)
         ori = turret.component<Orientation>();
 
 
-        //calcolo il nuovo orientamento della torretta
+        // calculate the new turret orientation
 
         newOri = ori->orientation * qy;
-        // rotazione da bodyOri a ori = bodyOri^-1 * ori
+        // rotation of bodyOri and ori = bodyOri^-1 * ori
         rotation = bodyOri->orientation.Inverse() * newOri;
         rotation.ToAngleAxis(angle, axis);
 
-        // se compreso fra -30 e +30 gradi, esegui la rotazione della torretta
+        // if it is between -30 and +30 degrees, rotate the turret
         if(Ogre::Math::Abs(angle.valueDegrees()) < 75)
         {
             ori->orientation = newOri;
         }
 
-        //esegui la rotazione del cannone
+        // Rotate the cannon
 
         //ori = cannon.component<Orientation>();
         //ori->orientation = ori->orientation * qx;
@@ -125,7 +123,7 @@ void PlayerManager::handleMouseMoved(const MouseMovedEvent& event)
 
 void PlayerManager::handleMousePressed(const MousePressedEvent& event)
 {
-
+    
 }
 
 void PlayerManager::handleMouseReleased(const MouseReleasedEvent& event)

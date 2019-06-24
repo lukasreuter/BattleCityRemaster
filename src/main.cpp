@@ -31,27 +31,29 @@
 using namespace Magnum;
 using namespace Magnum::Math::Literals;
 
-class BattleCityApp: public Platform::Application {
+class BattleCityApp: public Platform::Application 
+{
 public:
 	explicit BattleCityApp(const Arguments& arguments);
 
-    void receive([[maybe_unused]] const ShutDownEvent &event) { _quitGame = true; }
+    void receive(const ShutDownEvent&) { _quitGame = true; }
+
 private:
 	void drawEvent() override;
 	void tickEvent() override;
 
-	void viewportEvent(Sdl2Application::ViewportEvent &event) override;
+	void viewportEvent(Sdl2Application::ViewportEvent& event) override;
 
-	void keyPressEvent(KeyEvent &event) override;
+	void keyPressEvent(KeyEvent& event) override;
 
-	void keyReleaseEvent(KeyEvent &event) override;
+	void keyReleaseEvent(KeyEvent& event) override;
 
 	bool _quitGame = false;
 	Timeline _timeline;
 };
 
-BattleCityApp::BattleCityApp(const Arguments& arguments): Platform::Application{arguments,
-    Configuration{}.setTitle("BattleCity 2018").setWindowFlags(Configuration::WindowFlag::Resizable)}
+BattleCityApp::BattleCityApp(const Arguments& arguments) : Platform::Application{ arguments,
+    Configuration{}.setTitle("BattleCity 2018").setWindowFlags(Configuration::WindowFlag::Resizable) }
 {
 //    {
 //        /// create the actual window config. we can set the window title that way
@@ -90,7 +92,7 @@ BattleCityApp::BattleCityApp(const Arguments& arguments): Platform::Application{
 	//SoundManager.loadFiles();
 	//LOGD("Sound configured")
 	auto& InputManager = InputManager::GetRef();
-	//ScreenManager::GetRef().init(MenuScreen::GetRef());
+    ScreenManager::GetRef().Init<MenuScreen>();
 	LOGD("SCREEN configured")
 	
     //RenderManager::GetRef().setFrameListener(this);
@@ -169,7 +171,7 @@ void BattleCityApp::tickEvent()
     }
 }
 
-void BattleCityApp::viewportEvent(Platform::Sdl2Application::ViewportEvent &event)
+void BattleCityApp::viewportEvent(Platform::Sdl2Application::ViewportEvent& event)
 {
 
 }

@@ -6,6 +6,7 @@
 #include <time.h>
 #include <vector>
 #include <list>
+#include <string>
 #include <entt.hpp>
 
 
@@ -21,9 +22,9 @@ public:
     MapManager();
     void Init();
     void Update(/*entityx::ptr<entityx::EntityManager>*/);
-    int Collide(Position pos, Magnum::Vector3 delta, Orientation ori) const;
-  //  bool fireCollision(entityx::ptr<Position> start,entityx::ptr<Orientation>direction,Ogre::String name);
-    bool IsFree(Magnum::Vector3 pos);
+    int Collide(const Position& pos, const Magnum::Vector3& delta, const Orientation& ori) const;
+    bool FireCollision(const Position& start, const Orientation& direction, std::string name);
+    bool IsFree(float x, float z);
     void DeletePosition(Magnum::Vector3 pos);
     Magnum::Vector3 FindFreePos();
     
@@ -34,7 +35,7 @@ protected:
     void InitMaze(int maze[MAX][MAX]);
     void MazeGenerator(std::vector<std::vector<bool>> maze, int size, int shiftx, int shiftz);
     int IsClosed(int maze[MAX][MAX], int x, int y);
-    void PrintMaze(entt::DefaultRegistry& registry);
+    void PrintMaze(Registry& registry);
 
 private:
     int _finalMaze[MAX][MAX];
