@@ -1,3 +1,13 @@
+/**
+ @file      MovementManager.cpp
+ @author    Lukas Reuter
+ @date      01.09.18
+
+Copyright (c) 2018 till 2019, Lukas Reuter
+All rights reserved.
+
+*/
+
 #include "MovementManager.h"
 #include "Registry.hpp"
 #include "CollisionManager.h"
@@ -9,22 +19,22 @@
 void MovementManager::Init(Registry& registry)
 {
     registry.prepare_persistent_view<Position, Orientation>();
-    
+
     LOGD("MovementManager configured")
 }
 
 void MovementManager::Update(float dt, Registry& registry)
 {
     using namespace Magnum;
-    
+
     Vector3 delta;
-    
+
     registry.persistent_view<Position, Orientation>().each([&registry, &delta, dt] (auto entity, auto& pos, auto& ori)
     {
         std::string name = registry.get<Name>(entity).name;
 
         MessageManager::GetRef().emit<MoveEvent>(pos.position.x(), pos.position.y(), pos.position.z());
-        
+
         if (registry.has<AngularVelocity>(entity))
         {
             const auto& angVel = registry.get<AngularVelocity>(entity);

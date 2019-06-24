@@ -7,8 +7,8 @@ set_directory_properties(PROPERTIES CORRADE_USE_PEDANTIC_FLAGS ON)
 
 set(CMAKE_CXX_STANDARD 17)
 
-file(GLOB CPP_FILES *.cpp *.cc) 
-file(GLOB H_FILES *.h) 
+file(GLOB CPP_FILES *.cpp *.cc)
+file(GLOB H_FILES *.h)
 file(GLOB_RECURSE ENTT entt/src/entt/*.h entt/src/entt/*.hpp)
 
 add_executable(BattleCity2018 main.cpp

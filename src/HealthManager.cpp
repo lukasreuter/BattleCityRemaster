@@ -1,3 +1,13 @@
+/**
+ @file      HealthManager.cpp
+ @author    Lukas Reuter
+ @date      01.09.18
+
+Copyright (c) 2018 till 2019, Lukas Reuter
+All rights reserved.
+
+*/
+
 #include "HealthManager.h"
 #include "Components.h"
 #include "MessageManager.h"
@@ -28,7 +38,7 @@ void HealthManager::receive(const HitEvent& event)
 {
     LOGD("received Health event");
     auto& registry = EntityManager::Registry();
-    
+
     //!@todo: replace the lambda with a loop or else the early return dont work as expected
     auto view = registry.view<Destroyable, Renderable, Name>();
     //.each([&registry, &event] (auto entity, auto& destroyable, auto& renderable, auto& entName)
@@ -37,7 +47,7 @@ void HealthManager::receive(const HitEvent& event)
         auto& destroyable = registry.get<Destroyable>(entity);
         auto& renderable = registry.get<Renderable>(entity);
         auto& entName = registry.get<Name>(entity);
-        
+
         std::string name;
 
         if (entName.name != "Block")
@@ -61,7 +71,7 @@ void HealthManager::receive(const HitEvent& event)
             if (destroyable.health <= 0)
             {
                 MessageManager::GetRef().emit<ObjectDestroyed>(entity);
-                
+
 //                if (entity.valid()) redundant as the entity is always valid when using a view
                 {
                     auto& pos = registry.get<Position>(entity);

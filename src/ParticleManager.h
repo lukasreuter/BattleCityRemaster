@@ -1,3 +1,13 @@
+/**
+ @file      ParticleManager.h
+ @author    Lukas Reuter
+ @date      01.09.18
+
+Copyright (c) 2018 till 2019, Lukas Reuter
+All rights reserved.
+
+*/
+
 #pragma once
 
 #include "Singleton.h"
@@ -30,7 +40,7 @@ public:
     void ReceiveShootEvent(const ShootEvent &);
     void ReceiveObjectDestroyed(const ObjectDestroyed &);
     void Update(float dt);
-    
+
 private:
     void createEmitter(std::string name, Entity ent);
 

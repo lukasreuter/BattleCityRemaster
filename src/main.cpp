@@ -1,3 +1,13 @@
+/**
+ @file      main.cpp
+ @author    Lukas Reuter
+ @date      26.08.18
+
+Copyright (c) 2018 till 2019, Lukas Reuter
+All rights reserved.
+
+*/
+
 #include <Magnum/GL/DefaultFramebuffer.h>
 #include <Magnum/Platform/Sdl2Application.h>
 
@@ -31,7 +41,7 @@
 using namespace Magnum;
 using namespace Magnum::Math::Literals;
 
-class BattleCityApp: public Platform::Application 
+class BattleCityApp: public Platform::Application
 {
 public:
 	explicit BattleCityApp(const Arguments& arguments);
@@ -70,21 +80,21 @@ BattleCityApp::BattleCityApp(const Arguments& arguments) : Platform::Application
 	GL::Renderer::setClearColor(0xa5c9ea_rgbf);
     setSwapInterval(1);
     setMinimalLoopPeriod(16);
-	
+
 	LOGD("Hello! BattleCity2018 is running on"
 		<< GL::Context::current().version() << "using"
 		<< GL::Context::current().rendererString())
-	
+
 //    _quitGame = false;
-    
+
     /// MessageManager need to be the first component to init, everyone else depends on it
     auto& m = MessageManager::GetRef();
     /// not init the entity manager, other need it for preparing their components
     auto& e = EntityManager::GetRef();
     auto& registry = e.GetRegistry();
-    
+
     auto& d = DebugManager::GetRef();
-    
+
 	RenderManager::GetRef().init("Battlecity");
 	LOGD("RENDER configured")
 	auto & SoundManager = SoundManager::GetRef();
@@ -94,7 +104,7 @@ BattleCityApp::BattleCityApp(const Arguments& arguments) : Platform::Application
 	auto& InputManager = InputManager::GetRef();
     ScreenManager::GetRef().Init<MenuScreen>();
 	LOGD("SCREEN configured")
-	
+
     //RenderManager::GetRef().setFrameListener(this);
 	//LOGD("FRAME LISTENER attached")
 	PlayerManager::GetRef().init();
@@ -114,8 +124,8 @@ BattleCityApp::BattleCityApp(const Arguments& arguments) : Platform::Application
 	ParticleManager::GetRef().init();
 	LOGD("PARTICLE configured")
 	MessageManager::GetRef().subscribe<ShutDownEvent>(this);
-	
-	
+
+
 	/// actually start the frame and dt counting for the update functions
 	_timeline.start();
 }
@@ -123,16 +133,16 @@ BattleCityApp::BattleCityApp(const Arguments& arguments) : Platform::Application
 void BattleCityApp::drawEvent()
 {
     /// this is the render update, will only be called when the draw has been requested by dirtying the state with redraw()
-    
+
 	GL::defaultFramebuffer.clear(GL::FramebufferClear::Color);
 
-	
+
 	/// get the delta time elapsed since the last frame
 	auto dt = _timeline.previousFrameDuration();
-	
+
 	//if(RenderManager::getPtr()->getRenderWindow()->isClosed())
 	  //  return false;
-	
+
 	/// after all systems have been updated, actually draw to the screen
 //    RenderManager::GetRef()->update(dt);
 
@@ -148,23 +158,23 @@ void BattleCityApp::tickEvent()
 {
     /// this is the place where the simulation is run
     bool dirtyRender = false;
-    
+
     auto dt = _timeline.previousFrameDuration();
-    
+
     auto& registry = EntityManager::GetRef().GetRegistry();
-	
+
 	//ScreenManager::getPtr()->update(dt);
-	
+
     AIManager::GetRef().Update(dt, registry);
-	
+
     HeatingManager::GetRef().Update(dt, registry);
-	
+
 	MovementManager::GetRef().Update(dt, registry);
-	
+
 	//ParticleManager::getPtr()->update(dt);
-	
+
 	//RenderManager::getPtr()->update(dt);
-    
+
     dirtyRender |= true;
     if (dirtyRender) {
 //        redraw();

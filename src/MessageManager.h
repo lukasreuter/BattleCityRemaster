@@ -1,3 +1,13 @@
+/**
+ @file      MessageManager.h
+ @author    Lukas Reuter
+ @date      01.09.18
+
+Copyright (c) 2018 till 2019, Lukas Reuter
+All rights reserved.
+
+*/
+
 #pragma once
 
 #include "Singleton.h"
@@ -8,26 +18,26 @@
 class MessageManager : public Singleton<MessageManager>
 {
     entt::dispatcher dispatcher;
-    
+
 public:
     MessageManager() : dispatcher{} {}
 
     inline entt::dispatcher& GetDispatcher() noexcept { return dispatcher; }
-    
+
     /*! connects to a specific event */
     template <typename E, typename Receiver>
     inline void subscribe(Receiver* receiver) noexcept
     {
         dispatcher.sink<E>().connect(receiver);
     }
-    
+
     /*! disconnects from a specific event */
     template <class E, typename Receiver>
     inline void unsubscribe(Receiver* receiver) noexcept
     {
         dispatcher.sink<E>().disconnect(receiver);
     }
-    
+
     /*! triggers an event of type E */
     template <typename E, typename ... Args>
     inline void emit(Args&& ... args) noexcept
@@ -41,7 +51,7 @@ public:
     {
         dispatcher.enqueue<E>(args ...);
     }
-    
+
     /*! send all queued events to their respective listeners */
     template <typename E, typename ... Args>
     inline void update(Args&& ... args) noexcept

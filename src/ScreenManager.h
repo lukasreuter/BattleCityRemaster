@@ -1,3 +1,13 @@
+/**
+ @file      ScreenManager.h
+ @author    Lukas Reuter
+ @date      01.09.18
+
+Copyright (c) 2018 till 2019, Lukas Reuter
+All rights reserved.
+
+*/
+
 #pragma once
 
 #include "Screen.h"
@@ -11,7 +21,7 @@ class ScreenManager : public Singleton<ScreenManager>
 {
     // holds all the screens in a stack-like fashion
     std::vector<std::unique_ptr<Screen>> _screens;
-    
+
 public:
     ScreenManager() = default;
     ~ScreenManager();

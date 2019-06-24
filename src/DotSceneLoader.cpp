@@ -1,3 +1,13 @@
+/**
+ @file      DotSceneLoader.cpp
+ @author    Lukas Reuter
+ @date      01.09.18
+
+Copyright (c) 2018 till 2019, Lukas Reuter
+All rights reserved.
+
+*/
+
 #include "DotSceneLoader.h"
 #include "Logger.h"
 #include <rapidxml.hpp>
@@ -66,7 +76,7 @@ void DotSceneLoader::parseDotScene(const std::string& SceneName, const std::stri
 void DotSceneLoader::processScene(rapidxml::xml_node<>* XMLRoot)
 {
     using namespace std;
-    
+
     // Process the scene parameters
     string version = getAttrib(XMLRoot, "formatVersion", "unknown");
 
@@ -237,7 +247,7 @@ void DotSceneLoader::processEnvironment(rapidxml::xml_node<>* XMLNode)
     if (pElement) {
         processUserDataReference(pElement);
     }
- 
+
 }
 
 void DotSceneLoader::processTerrain(rapidxml::xml_node<>* XMLNode)
@@ -928,11 +938,11 @@ void DotSceneLoader::processFog(rapidxml::xml_node<>* XMLNode)
 void DotSceneLoader::processSkyBox(rapidxml::xml_node<>* XMLNode)
 {
     using namespace Magnum::Math;
-    
+
     // Process attributes
     bool active = getAttribBool(XMLNode, "active", false);
     if (not active) return;
-    
+
     std::string material = getAttrib(XMLNode, "material", "BaseWhite");
     double distance = getAttribReal(XMLNode, "distance", 5000);
     bool drawFirst = getAttribBool(XMLNode, "drawFirst", true);

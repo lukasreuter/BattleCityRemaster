@@ -1,3 +1,13 @@
+/**
+ @file      ParticleManager.cpp
+ @author    Lukas Reuter
+ @date      01.09.18
+
+Copyright (c) 2018 till 2019, Lukas Reuter
+All rights reserved.
+
+*/
+
 #include "ParticleManager.h"
 #include "RenderManager.h"
 #include "EntityManager.h"
@@ -32,7 +42,7 @@ void ParticleManager::ReceiveShootEvent(const ShootEvent &evt)
 void ParticleManager::ReceiveObjectDestroyed(const ObjectDestroyed& evt)
 {
     const auto& registry = EntityManager::Registry();
-    
+
     if (registry.valid(evt.object))
     {
         createEmitter("explosion", evt.object);

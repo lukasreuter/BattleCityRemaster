@@ -1,3 +1,13 @@
+/**
+ @file      HeatingManager.cpp
+ @author    Lukas Reuter
+ @date      01.09.18
+
+Copyright (c) 2018 till 2019, Lukas Reuter
+All rights reserved.
+
+*/
+
 #include "HeatingManager.h"
 #include "Components.h"
 

@@ -1,3 +1,13 @@
+/**
+ @file      Factory.cpp
+ @author    Lukas Reuter
+ @date      01.09.18
+
+Copyright (c) 2018 till 2019, Lukas Reuter
+All rights reserved.
+
+*/
+
 #include "Factory.h"
 #include "Components.h"
 #include "DotSceneLoader.h"
@@ -19,17 +29,17 @@ using Scene3D = Magnum::SceneGraph::Scene<Magnum::SceneGraph::MatrixTransformati
 Entity Factory::createTank(Registry& registry, std::string prefix, float linearVelocity, float angularVelocity, const Magnum::Vector3& overHeating, int health, bool ai)
 {
     using namespace Magnum;
-    
+
     DotSceneLoader loader;
     auto& sceneMgr = SceneManager::GetRef();
 
     loader.parseDotScene("tank.scene", "General", sceneMgr, 0, prefix);
-    
+
     auto* ctl    = sceneMgr.getSceneNode(prefix + "TankControl");
     auto* body   = sceneMgr.getSceneNode(prefix + "TankBody");
     auto* turret = sceneMgr.getSceneNode(prefix + "TankTurret");
     auto* cannon = sceneMgr.getSceneNode(prefix + "TankCannon");
-    
+
     Entity tankEmptyControl = registry.create();
     Entity tankTurret = registry.create();
     Entity tankBody = registry.create();
@@ -44,7 +54,7 @@ Entity Factory::createTank(Registry& registry, std::string prefix, float linearV
     registry.assign<Destroyable>(tankEmptyControl, health, health);
     registry.assign<Collidable>(tankEmptyControl);
     registry.assign<Name>(tankEmptyControl, prefix);
-    
+
     if (ai)
     {
         registry.assign<AI>(tankEmptyControl);
@@ -78,7 +88,7 @@ Entity Factory::createTank(Registry& registry, std::string prefix, float linearV
     registry.assign<Renderable>(tankCannon, cannon);
 
     ctl->scale(Vector3{ .35f, .55f, .35f });
-    
+
     return tankEmptyControl;
 }
 

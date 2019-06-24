@@ -1,3 +1,13 @@
+/**
+ @file      MapManager.h
+ @author    Lukas Reuter
+ @date      01.09.18
+
+Copyright (c) 2018 till 2019, Lukas Reuter
+All rights reserved.
+
+*/
+
 #pragma once
 
 #include "Singleton.h"
@@ -16,7 +26,7 @@ class MapManager : public Singleton<MapManager>
     static constexpr auto CELL = 65000;  // 30 * 30
     static constexpr auto WALL = 1;
     static constexpr auto PATH = 0;
-    
+
     friend class PlayScreen;
 public:
     MapManager();
@@ -27,7 +37,7 @@ public:
     bool IsFree(float x, float z);
     void DeletePosition(Magnum::Vector3 pos);
     Magnum::Vector3 FindFreePos();
-    
+
 protected:
     //Ogre::RaySceneQuery *mRaySceneQuery;
 

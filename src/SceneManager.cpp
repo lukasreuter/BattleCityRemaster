@@ -1,9 +1,12 @@
-//
-//  SceneManager.cpp
-//  CorradeInterconnect
-//
-//  Created by Lukas Reuter on 16.10.18.
-//
+/**
+ @file      SceneManager.cpp
+ @author    Lukas Reuter
+ @date      24.06.19
+
+Copyright (c) 2019, Lukas Reuter
+All rights reserved.
+
+*/
 
 #include "SceneManager.h"
 

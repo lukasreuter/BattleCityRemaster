@@ -1,11 +1,13 @@
 /**
- *  SoundManager.cpp
- *
- *  Original Code : Van Stokes, Jr. (http://www.EvilMasterMindsInc.com) - Aug 05
- *  Modified Code : Steven Gay - mec3@bluewin.ch - Septembre 2005
- *                  Deniz Sarikaya - daimler3@gmail.com - August 2010
- *
- */
+ @file      SoundManager.cpp
+ @author    Lukas Reuter
+ @date      01.09.18
+
+Copyright (c) 2018 till 2019, Lukas Reuter
+All rights reserved.
+
+*/
+
 #include "SoundManager.h"
 #include "MessageManager.h"
 

@@ -1,3 +1,13 @@
+/**
+ @file      Components.h
+ @author    Lukas Reuter
+ @date      01.09.18
+
+Copyright (c) 2018 till 2019, Lukas Reuter
+All rights reserved.
+
+*/
+
 #pragma once
 
 #include "RenderManager.h"
@@ -90,6 +100,6 @@ struct LightComponent
 {
     LightComponent() : light{nullptr} {}
     explicit LightComponent(SceneNode* l) : light(l) {}
-    
+
     SceneNode* light = nullptr;
 };

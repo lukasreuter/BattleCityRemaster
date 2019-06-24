@@ -1,9 +1,13 @@
-//
-//  Logger.h
-//  BattleCity2018
-//
-//  Created by Lukas Reuter on 01.09.18.
-//
+/**
+ @file      Logger.h
+ @author    Lukas Reuter
+ @date      01.09.18
+
+Copyright (c) 2018 till 2019, Lukas Reuter
+All rights reserved.
+
+*/
+
 #pragma once
 
 #include "Config.h"

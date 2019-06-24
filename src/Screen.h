@@ -1,3 +1,13 @@
+/**
+ @file      Screen.h
+ @author    Lukas Reuter
+ @date      01.09.18
+
+Copyright (c) 2018 till 2019, Lukas Reuter
+All rights reserved.
+
+*/
+
 #pragma once
 
 #include "Messages.h"
@@ -88,10 +98,10 @@ public:
     void Resume() final;
     void Leave() final;
     void Update(float) final {};
-    
+
     void keyPressed(const KeyPressedEvent&) final {};
     void keyReleased(const KeyReleasedEvent& evt) final;
-    
+
     //void buttonHit(OgreBites::Button *button);
     void YesNoDialogClosed(const std::string& question, bool yesHit);
 };

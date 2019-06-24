@@ -1,82 +1,12 @@
 /**
- *  SoundManager.h
- *
- *  Original Code : Van Stokes, Jr. (http://www.EvilMasterMindsInc.com) - Aug 05
- *  Modified Code : Steven Gay - mec3@bluewin.ch - Septembre 2005 - Jan 06
- *                  Deniz Sarikaya - daimler3@gmail.com - August 2010
- *                  IO
- *                    Partial Documentation
- *                    =====================
- *
- *  Very simple SoundManager using OpenAl.
- *
- *  For a more complete one, you should see :
- *  OpenAL++ http://alpp.sourceforge.net/
- *
- ****************************************************************************
- *  COMPILE
- *
- *  - Don't forget to link to : ALut.lib and OpenAL32.lib.
- *    The order is important.
- *
- *  - With CodeBlocks there is one warning I didn't resolve :
- *     "Warning: .drectve `/DEFAULTLIB:"uuid.lib" /DEFAULTLIB:"uuid.lib" ' unrecognized"
- *
- ****************************************************************************
- *  USAGE
- *
- * 1. Create the object from the class with createManager()
- *
- * 2. Call the init() function
- *
- * 3. Call the loadDefaultSounds() function to PRE-LOAD audio into the buffers.
- *    This is optional. Review the function to make changes that you need.
- *
- * 4. Set the Listener Location by calling setListenerPosition() function
- *    continually call this as your Listener (camera) position changes!
- *
- * 5. For each object that emits sound, call the loadSound() function.
- *    CAREFUL : The filename must be unique.
- *
- * 6. Optional : For each object you can set the all the parameters of the
- *    sound with setSound() or only the position, velocity and direction with
- *    setSoundPosition().
- *
- * 7. Call the playAudioSource() to play the sound at some event.
- *    This function will play the sound and then stop. It will NOT repeat playing.
- *    Use stopAudioSource() to stop a sound from playing if its still playing
- *
- * 8. Call pauseAudio() or pauseAllAudio() to pause one or all sound(s).
- *    Call resumeAudio() or resumeAllAudio() to resume one or all paused sound(s).
- *
- * 9. When your object is done emitting sounds (when out of range for example)
- *    call releaseAudioSource().
- *    It is important to release your source when you are no longer going to
- *    need it because you are limited in the number of sources you can have.
- *
- * 10. If your objects moves (other than the listener/camera) then
- *    continually update the objects position by calling setSourcePosition().
- *
- ******************************************************************************
- *
- * Additional informations :
- *
- * Ogg Vorbis - http://www.xiph.org/downloads/
- *            - http://www.illiminable.com/ogg/
- * Flac       - http://flac.sourceforge.net/features.html
- * Theora     - http://www.theora.org/
- *
- *
- ******************************************************************************
- *
- * TODO
- *
- * loadOGG()
- * alSourcePause()
- *
- * Use the EAX functions !
- *
- ******************************************************************************/
+ @file      SoundManager.h
+ @author    Lukas Reuter
+ @date      01.09.18
+
+Copyright (c) 2018 till 2019, Lukas Reuter
+All rights reserved.
+
+*/
 
  #ifndef __SOUNDMANAGER_H__
  #define __SOUNDMANAGER_H__

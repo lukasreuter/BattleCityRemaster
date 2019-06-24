@@ -1,3 +1,13 @@
+/**
+ @file      PlayerManager.cpp
+ @author    Lukas Reuter
+ @date      01.09.18
+
+Copyright (c) 2018 till 2019, Lukas Reuter
+All rights reserved.
+
+*/
+
 #include "PlayerManager.h"
 #include "MessageManager.h"
 #include "MapManager.h"
@@ -10,7 +20,7 @@
 void PlayerManager::init()
 {
 //    EntityManager::GetRegistry().
-    
+
 //    this->player =
 }
 
@@ -123,7 +133,7 @@ void PlayerManager::handleMouseMoved(const MouseMovedEvent& event)
 
 void PlayerManager::handleMousePressed(const MousePressedEvent& event)
 {
-    
+
 }
 
 void PlayerManager::handleMouseReleased(const MouseReleasedEvent& event)

@@ -1,3 +1,13 @@
+/**
+ @file      ShootManager.cpp
+ @author    Lukas Reuter
+ @date      01.09.18
+
+Copyright (c) 2018 till 2019, Lukas Reuter
+All rights reserved.
+
+*/
+
 #include "ShootManager.h"
 #include "RenderManager.h"
 #include "Components.h"
@@ -27,7 +37,7 @@ void ShootManager::init()
 void ShootManager::receive(const ShootEvent &event)
 {
     using namespace Magnum;
-    
+
     auto start = event.start;
     auto bdirection =  event.bodyDirection;
     auto tdirection =  event.turretDirection;
@@ -48,10 +58,10 @@ void ShootManager::receive(const ShootEvent &event)
             minName = itr->movable->getParentSceneNode()->getName();
         }
     }*/
-    
+
     auto& reg = EntityManager::Registry();
     auto e = event.entity;
-    
+
     std::string materialName = (reg.has<AI>(event.entity))
         ? "RedLaser"
         : "Laser";

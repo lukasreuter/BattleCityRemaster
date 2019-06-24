@@ -1,3 +1,13 @@
+/**
+ @file      MapManager.cpp
+ @author    Lukas Reuter
+ @date      01.09.18
+
+Copyright (c) 2018 till 2019, Lukas Reuter
+All rights reserved.
+
+*/
+
 #include "MapManager.h"
 #include "Factory.h"
 #include "Components.h"
@@ -32,7 +42,7 @@ void MapManager::Init()
         }
         toAdd = rand() % 2 + 8;
     }
-    
+
     LOGD(GREENBOLD << "MapManager" << RESET << "configured")
 }
 
@@ -52,7 +62,7 @@ void MapManager::InitMaze(int maze[MAX][MAX])
 void MapManager::MazeGenerator(std::vector<std::vector<bool>> maze, int size, int shiftx, int shiftz)
 {
     using namespace std;
-    
+
     const int maze_size_x = size;
     const int maze_size_y = size;
     list<pair<int, int>> drillers;
@@ -133,7 +143,7 @@ void MapManager::MazeGenerator(std::vector<std::vector<bool>> maze, int size, in
             }
         }
     }
-    
+
     for (auto y = 0; y < maze_size_y; ++y)
     {
         for (auto x = 0; x < maze_size_x; ++x)
@@ -150,9 +160,9 @@ void MapManager::MazeGenerator(std::vector<std::vector<bool>> maze, int size, in
 
 int MapManager::IsClosed(int maze[MAX][MAX], int x, int y)
 {
-    return (maze[x - 1][y] == WALL && 
-            maze[x][y - 1] == WALL && 
-            maze[x][y + 1] == WALL && 
+    return (maze[x - 1][y] == WALL &&
+            maze[x][y - 1] == WALL &&
+            maze[x][y + 1] == WALL &&
             maze[x + 1][y] == WALL)
         ? WALL
         : PATH;
@@ -161,10 +171,10 @@ int MapManager::IsClosed(int maze[MAX][MAX], int x, int y)
 void MapManager::PrintMaze(Registry& registry)
 {
     // metal threshold choice instead of bricks
-    constexpr int pMetalTreshold = 15; 
+    constexpr int pMetalTreshold = 15;
     int p = 0;
     std::string material;
-    
+
     for (int i = 0; i < 62; ++i)
     {
         _finalMaze[0][i]  = WALL;
@@ -172,7 +182,7 @@ void MapManager::PrintMaze(Registry& registry)
         _finalMaze[i][0]  = WALL;
         _finalMaze[i][61] = WALL;
     }
-    
+
     _finalMaze[0][0] = 2;
     for (int i = 0; i < MAX; ++i)
     {
@@ -194,17 +204,17 @@ void MapManager::PrintMaze(Registry& registry)
 int MapManager::Collide(const Position& pos, const Magnum::Vector3& delta, const Orientation& ori) const
 {
     using namespace Magnum;
-    
+
     auto dt = delta * 4;
     Vector3 newPos = pos.position + dt - Vector3::zAxis(ori.orientation.axis().z());
-    
+
     if ((newPos.x() + 125) / 4 < 0 || (newPos.x() + 125) / 4 > MAX)
         return PATH;
     if ((newPos.z() + 125) / 4 < 0 || (newPos.z() + 125) / 4 > MAX)
         return PATH;
     if (_finalMaze[int((newPos.z() + 125) / 4)][int(newPos.x() + 125) / 4] == WALL)
         return WALL;
-    
+
     newPos = pos.position + dt - 2 * Vector3::xAxis(ori.orientation.axis().x());
     if (_finalMaze[int((newPos.z() + 125) / 4)][int(newPos.x() + 125) / 4] == WALL)
         return WALL;

@@ -1,3 +1,13 @@
+/**
+ @file      ScoreManager.cpp
+ @author    Lukas Reuter
+ @date      01.09.18
+
+Copyright (c) 2018 till 2019, Lukas Reuter
+All rights reserved.
+
+*/
+
 #include "ScoreManager.h"
 #include "Logger.h"
 #include "EntityManager.h"
@@ -22,7 +32,7 @@ ScoreManager::~ScoreManager()
 void ScoreManager::receive(const ObjectDestroyed& event)
 {
     auto& reg = EntityManager::Registry();
-    
+
     auto obj = event.object;
     auto player = PlayerManager::GetPlayer();
 

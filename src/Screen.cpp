@@ -1,3 +1,13 @@
+/**
+ @file      Screen.cpp
+ @author    Lukas Reuter
+ @date      01.09.18
+
+Copyright (c) 2018 till 2019, Lukas Reuter
+All rights reserved.
+
+*/
+
 #include "Screen.h"
 #include "RenderManager.h"
 #include "InputManager.h"
@@ -186,7 +196,7 @@ void PlayScreen::Update(float)
 {
     Entity player = PlayerManager::GetPlayer();
     auto& registry = EntityManager::Registry();
-    
+
     if (registry.valid(player))
     {
         auto& dest = registry.get<Destroyable>(player);
@@ -224,11 +234,11 @@ void PlayScreen::keyPressed(const KeyPressedEvent& evt)
 {
     PlayerManager::GetRef().handleKeyPressed(evt);
 }
- 
+
 void PlayScreen::keyReleased(const KeyReleasedEvent& evt)
 {
     using Key = Magnum::Platform::Sdl2Application::KeyEvent::Key;
-    
+
     if (evt.key == Key::Esc) {
         ScreenManager::GetRef().PushScreen<PauseScreen>();
     } else {
@@ -292,7 +302,7 @@ void PauseScreen::YesNoDialogClosed(const std::string& question, bool yesHit)
 void PauseScreen::keyReleased(const KeyReleasedEvent& evt)
 {
     using Key = Magnum::Platform::Sdl2Application::KeyEvent::Key;
-    
+
     if (evt.key == Key::Esc) {
         ScreenManager::GetRef().PopScreen();
     }

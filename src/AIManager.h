@@ -1,3 +1,13 @@
+/**
+ @file      AIManager.h
+ @author    Lukas Reuter
+ @date      01.09.18
+
+Copyright (c) 2018 till 2019, Lukas Reuter
+All rights reserved.
+
+*/
+
 #pragma once
 
 #include "Singleton.h"
@@ -19,7 +29,7 @@ private:
     entityx::EventManager* events;
 
  */
-    
+
     void Seek(Velocity& vel, AngularVelocity& angVel, const Orientation& ori, const Magnum::Vector3& diff, Magnum::Rad theta, float dt);
     void Walk(Velocity& vel, AngularVelocity& angVel, const Orientation& ori, const Position& pos, double dt);
     void Fire(Entity start, Entity end);

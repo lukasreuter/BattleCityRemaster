@@ -1,9 +1,13 @@
-//
-//  ManagerInterface.h
-//  BattleCity2018
-//
-//  Created by Lukas Reuter on 27.08.18.
-//
+/**
+ @file      ManagerInterface.h
+ @author    Lukas Reuter
+ @date      01.09.18
+
+Copyright (c) 2018 till 2019, Lukas Reuter
+All rights reserved.
+
+*/
+
 #pragma once
 
 #include <entt.hpp>
