@@ -5,5 +5,5 @@
 	path = corrade
 	url = https://github.com/mosra/corrade
 [submodule "src/entt"]
-	path = src/entt
+	path = include/entt
 	url = https://github.com/skypjack/entt
